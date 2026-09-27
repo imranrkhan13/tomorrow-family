@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "node --import tsx server/dev.ts",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && node --import tsx scripts/build-demo.ts && vite build",
     "test": "node --import tsx --test tests/*.test.ts",
     "verify": "npm test && npm run test:runtime && npm run build",
     "start": "node --import tsx server/dev.ts",
