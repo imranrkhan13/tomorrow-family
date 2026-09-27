@@ -5,14 +5,15 @@
   "type": "module",
   "license": "MIT",
   "engines": {
-    "node": ">=22"
+    "node": "22.x"
   },
   "scripts": {
     "dev": "node --import tsx server/dev.ts",
     "build": "tsc --noEmit && vite build",
     "test": "node --import tsx --test tests/*.test.ts",
     "verify": "npm test && npm run build",
-    "start": "node --import tsx server/dev.ts"
+    "start": "node --import tsx server/dev.ts",
+    "test:runtime": "tsc --noEmit false --outDir .private/compiled --module NodeNext --moduleResolution NodeNext && node --test .private/compiled/tests/*.test.js"
   },
   "dependencies": {
     "zod": "^4.1.0"

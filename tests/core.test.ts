@@ -1,5 +1,5 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';import {mkdtemp,readFile} from 'node:fs/promises';import {tmpdir} from 'node:os';import {join} from 'node:path';
-import {FileStore} from '../server/store';import {extract,inputHash,validateInput,type Input} from '../server/extraction';import {outputSchema,validDate,nextDate,calendar,type Task} from '../src/model';import {link,evidenceFrom} from '../src/ground';
+import {FileStore} from '../server/store.js';import {extract,inputHash,validateInput,type Input} from '../server/extraction.js';import {outputSchema,validDate,nextDate,calendar,type Task} from '../src/model.js';import {link,evidenceFrom} from '../src/ground.js';
 const raw=JSON.parse(await readFile('tests/fixtures/interfaze-notice.json','utf8'));
 const fixture=JSON.parse(raw.choices[0].message.content);
 const source='Maple School — fictional product test notice\nIssued: 2026-09-27\nClass trip: 2026-09-29 at 08:30.\nPlease return the permission slip by 2026-09-28.\nBring a water bottle and packed lunch on 2026-09-29.';

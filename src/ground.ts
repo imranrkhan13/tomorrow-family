@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import {type Cited,type Evidence,type Extraction,type LinkedField,type LinkedTask,validDate,validTime} from './model';
+import {type Cited,type Evidence,type Extraction,type LinkedField,type LinkedTask,validDate,validTime} from './model.js';
 export function evidenceFrom(raw:unknown,text:string):Evidence[]{const evidence:Evidence[]=[];if(text){let start=0;for(const full of text.split(/(?<=\n)/)){const quote=full.trimEnd();if(quote)evidence.push({quote,confidence:null,span:[start,start+quote.length]});start+=full.length;}}
  const point=z.object({x:z.number().finite().nonnegative(),y:z.number().finite().nonnegative()});
  const section=z.object({lines:z.array(z.object({text:z.string(),average_confidence:z.number().min(0).max(1).optional(),bounds:z.object({top_left:point,top_right:point,bottom_left:point,bottom_right:point})}))});

@@ -1,8 +1,8 @@
 import {createHash} from 'node:crypto';
 import {z} from 'zod';
-import {outputSchema,type Result} from '../src/model';
-import {evidenceFrom,link} from '../src/ground';
-import type {Store} from './store';
+import {outputSchema,type Result} from '../src/model.js';
+import {evidenceFrom,link} from '../src/ground.js';
+import type {Store} from './store.js';
 const mimes=['image/png','image/jpeg','image/webp','application/pdf','audio/mpeg','audio/wav','audio/mp4','audio/webm','audio/ogg'] as const;
 export const inputSchema=z.object({text:z.string().max(30000),file:z.object({name:z.string().max(180),mime:z.enum(mimes),base64:z.string().max(4_000_000)}).nullable()}).strict();
 export type Input=z.infer<typeof inputSchema>;

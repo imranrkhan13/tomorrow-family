@@ -1,7 +1,7 @@
 import type {IncomingMessage,ServerResponse} from 'node:http';
 import {timingSafeEqual} from 'node:crypto';
-import {FileStore,RedisStore,type Store} from './store';
-import {extract,inputSchema} from './extraction';
+import {FileStore,RedisStore,type Store} from './store.js';
+import {extract,inputSchema} from './extraction.js';
 export function storeFor(local=false):Store|null{if(local)return new FileStore();const url=process.env.UPSTASH_REDIS_REST_URL??process.env.KV_REST_API_URL,token=process.env.UPSTASH_REDIS_REST_TOKEN??process.env.KV_REST_API_TOKEN;return url&&token?new RedisStore(url,token):null;}
 function enabled(local:boolean){return !!process.env.INTERFAZE_API_KEY&&process.env.FREE_CREDIT_CONFIRMED==='true'&&!!storeFor(local)&&(local||!!process.env.HOUSEHOLD_ACCESS_CODE)&&Number(process.env.TOKEN_CAP)>=1032000&&Number(process.env.CREDIT_CAP_USD)>=1.612;}
 function authorized(req:IncomingMessage,local:boolean){if(local)return true;const actual=Buffer.from(req.headers.authorization?.replace(/^Bearer /,'')??''),expected=Buffer.from(process.env.HOUSEHOLD_ACCESS_CODE??'');return expected.length>=16&&actual.length===expected.length&&timingSafeEqual(actual,expected);}

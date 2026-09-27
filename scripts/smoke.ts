@@ -1,4 +1,4 @@
-import {loadEnv} from 'vite';import {extract} from '../server/extraction';import {FileStore} from '../server/store';
+import {loadEnv} from 'vite';import {extract} from '../server/extraction.js';import {FileStore} from '../server/store.js';
 Object.assign(process.env,loadEnv('development',process.cwd(),''));
 const input={text:'Maple School — fictional product test notice\nIssued: 2026-09-27\nClass trip: 2026-09-29 at 08:30.\nPlease return the permission slip by 2026-09-28.\nBring a water bottle and packed lunch on 2026-09-29.',file:null};
 try{const result=await extract(input,new FileStore(),{key:process.env.INTERFAZE_API_KEY!,freeConfirmed:true,tokenCap:2000000,creditCap:2});console.log(JSON.stringify({tasks:result.tasks.map(t=>({title:t.title.value,date:t.date.value,time:t.time.value,evidence:t.title.evidence.length})),tokens:result.tokens,usd:result.usd,latencyMs:result.latencyMs,cacheHit:result.cacheHit},null,2));}catch(e){console.log(e instanceof Error?e.message:'Failed');process.exitCode=1;}

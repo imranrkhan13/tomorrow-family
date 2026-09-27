@@ -1,4 +1,4 @@
-import type {Notice,Task} from '../src/model';
+import type {Notice,Task} from '../src/model.js';
 let db:IDBDatabase;
 export async function init(){db=await new Promise((resolve,reject)=>{const r=indexedDB.open('tomorrow-family-v1',1);r.onupgradeneeded=()=>{r.result.createObjectStore('notices',{keyPath:'id'});r.result.createObjectStore('tasks',{keyPath:'id'});};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}
 export function all<T>(store:'notices'|'tasks'):Promise<T[]>{return new Promise((resolve,reject)=>{const r=db.transaction(store).objectStore(store).getAll();r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}
