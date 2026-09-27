@@ -5,7 +5,7 @@
 - 12,466 tokens, $0.021307 free-credit consumption, 20.13 seconds.
 - Same notice exercised through browser upload/review: cache hit, zero new requests.
 - Browser review: permission-slip deadline confirmed, appeared on Tomorrow correctly.
-- Eleven offline tests: schema, evidence ambiguity, calendar injection, date rollover,
+- Twelve offline tests: schema, evidence ambiguity, calendar injection, date rollover,
   input validation, cache reuse, budget rejection, quota failure, malformed output,
   and concurrent reservations.
 - Real Interfaze image extraction: three expected tasks, each with a verified OCR box.

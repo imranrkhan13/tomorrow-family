@@ -6,6 +6,10 @@ Tomorrow turns a school notice, screenshot, PDF or voice note into a checklist a
 parent can verify: what to do, what to pack, and when to be there. **Interfaze is the
 only AI/extraction provider.** No alternative OCR engine and no fabricated AI output.
 
+Live app: https://tomorrow-family.vercel.app
+
+Public MIT source: https://github.com/imranrkhan13/tomorrow-family
+
 ## Use it
 
 1. Add a notice: paste text or upload a file up to 3 MB.
