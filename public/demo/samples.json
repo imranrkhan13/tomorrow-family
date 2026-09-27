@@ -1,0 +1,289 @@
+{
+  "version": 1,
+  "samples": [
+    {
+      "id": "text",
+      "name": "Fictional trip notice · text",
+      "sourceKind": "text",
+      "sourceText": "Maple School — fictional product test notice\nIssued: 2026-09-27\nClass trip: 2026-09-29 at 08:30.\nPlease return the permission slip by 2026-09-28.\nBring a water bottle and packed lunch on 2026-09-29.",
+      "sourceImage": null,
+      "sourceSha256": "60742e7647f7c19fa6ff85bff1740b864cbdaa873f9681807e20fe0f261c6a16",
+      "model": "interfaze",
+      "fixture": "genuine",
+      "receivedAt": "2026-09-27",
+      "summary": "Maple School trip scheduled for 2026-09-29 requiring a permission slip by 2026-09-28 and specific items to be brought on the day.",
+      "tasks": [
+        {
+          "title": {
+            "value": "Return permission slip",
+            "quote": "Please return the permission slip by 2026-09-28.",
+            "confidence": 1,
+            "evidence": [
+              {
+                "quote": "Please return the permission slip by 2026-09-28.",
+                "confidence": null,
+                "span": [
+                  97,
+                  145
+                ]
+              }
+            ],
+            "reasons": []
+          },
+          "kind": "do",
+          "date": {
+            "value": "2026-09-28",
+            "quote": "2026-09-28",
+            "confidence": 1,
+            "evidence": [],
+            "reasons": [
+              "Quote not verified against source metadata"
+            ]
+          },
+          "time": {
+            "value": null,
+            "quote": null,
+            "confidence": 0,
+            "evidence": [],
+            "reasons": [
+              "No time found",
+              "Quote not verified against source metadata",
+              "Extraction confidence below 90%"
+            ]
+          },
+          "notes": "Deadline for permission slip submission."
+        },
+        {
+          "title": {
+            "value": "Class trip",
+            "quote": "Class trip: 2026-09-29 at 08:30.",
+            "confidence": 1,
+            "evidence": [
+              {
+                "quote": "Class trip: 2026-09-29 at 08:30.",
+                "confidence": null,
+                "span": [
+                  64,
+                  96
+                ]
+              }
+            ],
+            "reasons": []
+          },
+          "kind": "event",
+          "date": {
+            "value": "2026-09-29",
+            "quote": "2026-09-29",
+            "confidence": 1,
+            "evidence": [],
+            "reasons": [
+              "Quote not verified against source metadata"
+            ]
+          },
+          "time": {
+            "value": "08:30",
+            "quote": "08:30",
+            "confidence": 1,
+            "evidence": [],
+            "reasons": [
+              "Quote not verified against source metadata"
+            ]
+          },
+          "notes": "Scheduled class trip departure."
+        },
+        {
+          "title": {
+            "value": "Bring water bottle and packed lunch",
+            "quote": "Bring a water bottle and packed lunch on 2026-09-29.",
+            "confidence": 1,
+            "evidence": [
+              {
+                "quote": "Bring a water bottle and packed lunch on 2026-09-29.",
+                "confidence": null,
+                "span": [
+                  146,
+                  198
+                ]
+              }
+            ],
+            "reasons": []
+          },
+          "kind": "bring",
+          "date": {
+            "value": "2026-09-29",
+            "quote": "2026-09-29",
+            "confidence": 1,
+            "evidence": [],
+            "reasons": [
+              "Quote not verified against source metadata"
+            ]
+          },
+          "time": {
+            "value": null,
+            "quote": null,
+            "confidence": 0,
+            "evidence": [],
+            "reasons": [
+              "No time found",
+              "Quote not verified against source metadata",
+              "Extraction confidence below 90%"
+            ]
+          },
+          "notes": "Items needed for the class trip."
+        }
+      ],
+      "usage": {
+        "promptTokens": 11162,
+        "completionTokens": 1304,
+        "costUsd": 0.021307
+      }
+    },
+    {
+      "id": "image",
+      "name": "Fictional trip notice · photo",
+      "sourceKind": "image",
+      "sourceText": "",
+      "sourceImage": "/demo/notice.png",
+      "sourceSha256": "aea3746a1e7e5b92a0eaeb45f19466cc22d4c9d7176c6a0be3693500eedcd775",
+      "model": "interfaze",
+      "fixture": "genuine",
+      "receivedAt": "2026-09-27",
+      "summary": "Maple School has a class trip on 2026-09-29. Permission slips must be returned by 2026-09-28. Students need to bring a water bottle and packed lunch.",
+      "tasks": [
+        {
+          "title": {
+            "value": "Return permission slip",
+            "quote": "Return permission slip by 2026-09-28.",
+            "confidence": 1,
+            "evidence": [
+              {
+                "quote": "Return permission slip by 2026-09-28.",
+                "confidence": 0.99,
+                "box": [
+                  64,
+                  386,
+                  514,
+                  35
+                ],
+                "width": 1100,
+                "height": 760
+              }
+            ],
+            "reasons": []
+          },
+          "kind": "do",
+          "date": {
+            "value": "2026-09-28",
+            "quote": "2026-09-28",
+            "confidence": 1,
+            "evidence": [],
+            "reasons": [
+              "Quote not verified against source metadata"
+            ]
+          },
+          "time": {
+            "value": null,
+            "quote": null,
+            "confidence": 0,
+            "evidence": [],
+            "reasons": [
+              "No time found",
+              "Quote not verified against source metadata",
+              "Extraction confidence below 90%"
+            ]
+          },
+          "notes": "Deadline for return of permission slip."
+        },
+        {
+          "title": {
+            "value": "Bring water bottle and packed lunch",
+            "quote": "Bring water bottle and packed lunch.",
+            "confidence": 1,
+            "evidence": [
+              {
+                "quote": "Bring water bottle and packed lunch.",
+                "confidence": 1,
+                "box": [
+                  64,
+                  448,
+                  490,
+                  33
+                ],
+                "width": 1100,
+                "height": 760
+              }
+            ],
+            "reasons": []
+          },
+          "kind": "bring",
+          "date": {
+            "value": "2026-09-29",
+            "quote": "Class trip: 2026-09-29",
+            "confidence": 0.9,
+            "evidence": [],
+            "reasons": [
+              "Quote not verified against source metadata"
+            ]
+          },
+          "time": {
+            "value": "08:30",
+            "quote": "08:30",
+            "confidence": 1,
+            "evidence": [],
+            "reasons": [
+              "Quote not verified against source metadata"
+            ]
+          },
+          "notes": "Items needed for the class trip."
+        },
+        {
+          "title": {
+            "value": "Class trip",
+            "quote": "Class trip: 2026-09-29 at 08:30.",
+            "confidence": 1,
+            "evidence": [
+              {
+                "quote": "Class trip: 2026-09-29 at 08:30.",
+                "confidence": 0.99,
+                "box": [
+                  63,
+                  326,
+                  425,
+                  34
+                ],
+                "width": 1100,
+                "height": 760
+              }
+            ],
+            "reasons": []
+          },
+          "kind": "event",
+          "date": {
+            "value": "2026-09-29",
+            "quote": "2026-09-29",
+            "confidence": 1,
+            "evidence": [],
+            "reasons": [
+              "Quote not verified against source metadata"
+            ]
+          },
+          "time": {
+            "value": "08:30",
+            "quote": "08:30",
+            "confidence": 1,
+            "evidence": [],
+            "reasons": [
+              "Quote not verified against source metadata"
+            ]
+          },
+          "notes": "Class trip event. Contact teacher for questions."
+        }
+      ],
+      "usage": {
+        "promptTokens": 13357,
+        "completionTokens": 1433,
+        "costUsd": 0.025051
+      }
+    }
+  ]
+}
