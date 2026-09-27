@@ -76,8 +76,8 @@ flowchart LR
   I --> U[Raw response and token ledger]
 ```
 
-Audio uses Interfaze transcription before the same extraction schema. Each stage
-has its own durable cache entry. Transcript offsets link text, not acoustic truth.
+Audio uses two Interfaze calls: transcription, then extraction. This is not
+one call per audio input. Each stage has its own durable cache entry. Transcript offsets link text, not acoustic truth.
 Images use OCR precontext boxes when uniquely matched; unsupported metadata or
 quotes are labeled unverified. PDFs retain the original for comparison; page-level
 box overlays are not implemented. Relative or ambiguous dates must stay blank
@@ -91,13 +91,21 @@ unless the source has an explicit dated anchor; all proposed dates require revie
   truncated, malformed or unmetered calls halt further spending. Cached successful
   notices remain readable. Never delete pending entries just to retry.
 - Reserve 1,032,000 tokens and $1.612 before each call (documented full context and
-  output limits). Settle actual usage afterward. Caps default to zero; hosted pilot
+  output limits). Completion has an explicit 6,000-token maximum (4,096 for
+  transcription). Interfaze multipass preprocessing can add billed input tokens,
+  so client file and text limits do not prove a lower per-call spend ceiling.
+  Settle actual usage afterward. Caps default to zero; the hosted pilot
   uses a $2 allocation from the user's stated $20 free balance. Other clients'
   account usage cannot be monitored by this app.
-- Provider prices used: $1.50/M input, $3.50/M output, checked September 27, 2026.
+- Provider prices used: $1.50/M input, $3.50/M output, checked September 27, 2026 at https://interfaze.ai/pricing. Input accounting caveat:
+  https://interfaze.ai/docs/faqs.
   Unexpected usage above the reservation halts future calls. Upstream limits and
   accounting remain outside application control.
 - Serial global reservation plus 1-second admission spacing stays below 50 req/s.
+  A browser-local UUID is admitted for at most six new stages per hour; this
+  per-device throttle is a convenience control, not a strong identity or abuse barrier.
+  A failed browser response can check the persisted result without resubmitting;
+  no automatic retry occurs.
   Request timeout is 280 seconds for image/text/PDF; audio gives each of two stages
   140 seconds so the full request fits the 300-second function limit.
 - Input cap is 3 MB, below Interfaze's 20 MB maximum, to fit Vercel's request body
