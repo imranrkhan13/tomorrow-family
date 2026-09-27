@@ -1,0 +1,16 @@
+import {z} from 'zod';
+export const cited=z.object({value:z.string().max(500).nullable(),quote:z.string().max(2000).nullable(),confidence:z.number().min(0).max(1)}).strict();
+export const outputSchema=z.object({schema_version:z.literal('tomorrow.v1'),summary:z.string().max(1000),tasks:z.array(z.object({title:cited,kind:z.enum(['bring','do','event']),date:cited,time:cited,notes:z.string().max(1000)}).strict()).max(40)}).strict();
+export type Cited=z.infer<typeof cited>;
+export type Extraction=z.infer<typeof outputSchema>;
+export type Evidence={quote:string;confidence:number|null;box?:[number,number,number,number];width?:number;height?:number;span?:[number,number];page?:number};
+export type LinkedField=Cited&{evidence:Evidence[];reasons:string[]};
+export type LinkedTask={title:LinkedField;kind:'bring'|'do'|'event';date:LinkedField;time:LinkedField;notes:string};
+export type Result={summary:string;tasks:LinkedTask[];transcript:string|null;tokens:number;usd:number;latencyMs:number;cacheHit:boolean;inputHash:string};
+export type Task={id:string;noticeId:string;child:string;title:string;kind:'bring'|'do'|'event';date:string|null;time:string|null;notes:string;status:'review'|'confirmed';done:boolean;original:LinkedTask|null;reviewedAt?:string};
+export type Notice={id:string;name:string;child:string;createdAt:string;mime:string;text:string;file:Blob|null;inputHash?:string;summary:string;status:'saved'|'extracted'|'failed';error?:string};
+export function dateKey(d=new Date()){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+export function nextDate(key:string,days=1){const [y,m,d]=key.split('-').map(Number);const date=new Date(y,m-1,d,12);date.setDate(date.getDate()+days);return dateKey(date);}
+export function validDate(value:string|null){if(!value||!/^\d{4}-\d{2}-\d{2}$/.test(value))return false;const [y,m,d]=value.split('-').map(Number);const date=new Date(y,m-1,d,12);return dateKey(date)===value;}
+export function validTime(value:string|null){return value===null||/^([01]\d|2[0-3]):[0-5]\d$/.test(value);}
+export function calendar(tasks:Task[]){const escape=(v:string)=>v.replace(/\\/g,'\\\\').replace(/\r?\n/g,'\\n').replace(/,/g,'\\,').replace(/;/g,'\\;');const stamp=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Tomorrow//Family checklist//EN','CALSCALE:GREGORIAN'];for(const t of tasks){if(t.status!=='confirmed'||!validDate(t.date)||t.done)continue;const date=t.date!.replaceAll('-','');lines.push('BEGIN:VEVENT',`UID:${t.id}@tomorrow.local`,`DTSTAMP:${stamp}`);if(t.time&&validTime(t.time)){lines.push(`DTSTART:${date}T${t.time.replace(':','')}00`);}else{lines.push(`DTSTART;VALUE=DATE:${date}`,`DTEND;VALUE=DATE:${nextDate(t.date!).replaceAll('-','')}`);}lines.push(`SUMMARY:${escape(t.title)}`,`DESCRIPTION:${escape([t.child,t.notes,'Confirmed in Tomorrow. Check original notice for changes.'].filter(Boolean).join('\n'))}`,'END:VEVENT');}lines.push('END:VCALENDAR');return lines.map(line=>{let out='',bytes=0;for(const c of line){const n=new TextEncoder().encode(c).length;if(bytes+n>73){out+='\r\n ';bytes=1;}out+=c;bytes+=n;}return out;}).join('\r\n')+'\r\n';}

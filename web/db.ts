@@ -1,0 +1,7 @@
+import type {Notice,Task} from '../src/model';
+let db:IDBDatabase;
+export async function init(){db=await new Promise((resolve,reject)=>{const r=indexedDB.open('tomorrow-family-v1',1);r.onupgradeneeded=()=>{r.result.createObjectStore('notices',{keyPath:'id'});r.result.createObjectStore('tasks',{keyPath:'id'});};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}
+export function all<T>(store:'notices'|'tasks'):Promise<T[]>{return new Promise((resolve,reject)=>{const r=db.transaction(store).objectStore(store).getAll();r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}
+export function put(store:'notices'|'tasks',value:Notice|Task){return new Promise<void>((resolve,reject)=>{const tx=db.transaction(store,'readwrite');tx.objectStore(store).put(value);tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);});}
+export function removeNotice(id:string){return new Promise<void>((resolve,reject)=>{const tx=db.transaction(['notices','tasks'],'readwrite');tx.objectStore('notices').delete(id);const r=tx.objectStore('tasks').openCursor();r.onsuccess=()=>{const c=r.result;if(c){if(c.value.noticeId===id)c.delete();c.continue();}};tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);});}
+export function removeTask(id:string){return new Promise<void>((resolve,reject)=>{const tx=db.transaction('tasks','readwrite');tx.objectStore('tasks').delete(id);tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);});}

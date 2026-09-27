@@ -1,0 +1,1036 @@
+{
+  "id": "req-bfd70ed4-2c8f-4d54-8d22-974ccc78275f",
+  "object": "chat.completion",
+  "created": 1790491217,
+  "model": "interfaze-beta",
+  "usage": {
+    "prompt_tokens": 13357,
+    "completion_tokens": 1433,
+    "total_tokens": 14790,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "cached_tokens": 0
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "vcache": false,
+  "precontext": [
+    {
+      "name": "ocr",
+      "result": {
+        "extracted_text": "MAPLE SCHOOL\nFictional notice for product testing\nIssued: 2026-09-27\nClass trip: 2026-09-29 at 08:30.\nReturn permission slip by 2026-09-28.\nBring water bottle and packed lunch.\nContact the teacher if you have questions.",
+        "sections": [
+          {
+            "text": "MAPLE SCHOOL\nFictional notice for product testing\nIssued: 2026-09-27\nClass trip: 2026-09-29 at 08:30.\nReturn permission slip by 2026-09-28.\nBring water bottle and packed lunch.\nContact the teacher if you have questions.",
+            "lines": [
+              {
+                "text": "MAPLE SCHOOL",
+                "words": [
+                  {
+                    "text": "MAPLE",
+                    "bounds": {
+                      "top_left": {
+                        "x": 65,
+                        "y": 65
+                      },
+                      "top_right": {
+                        "x": 195,
+                        "y": 64
+                      },
+                      "bottom_right": {
+                        "x": 195,
+                        "y": 100
+                      },
+                      "bottom_left": {
+                        "x": 66,
+                        "y": 99
+                      },
+                      "width": 129.5,
+                      "height": 35
+                    },
+                    "confidence": 0.99
+                  },
+                  {
+                    "text": "SCHOOL",
+                    "bounds": {
+                      "top_left": {
+                        "x": 217,
+                        "y": 64
+                      },
+                      "top_right": {
+                        "x": 380,
+                        "y": 63
+                      },
+                      "bottom_right": {
+                        "x": 379,
+                        "y": 100
+                      },
+                      "bottom_left": {
+                        "x": 217,
+                        "y": 100
+                      },
+                      "width": 162.5,
+                      "height": 36.5
+                    },
+                    "confidence": 1
+                  }
+                ],
+                "average_confidence": 1,
+                "bounds": {
+                  "top_left": {
+                    "x": 65,
+                    "y": 63
+                  },
+                  "top_right": {
+                    "x": 380,
+                    "y": 63
+                  },
+                  "bottom_right": {
+                    "x": 380,
+                    "y": 100
+                  },
+                  "bottom_left": {
+                    "x": 65,
+                    "y": 100
+                  },
+                  "width": 315,
+                  "height": 36.5
+                }
+              },
+              {
+                "text": "Fictional notice for product testing",
+                "words": [
+                  {
+                    "text": "Fictional",
+                    "bounds": {
+                      "top_left": {
+                        "x": 64,
+                        "y": 148
+                      },
+                      "top_right": {
+                        "x": 178,
+                        "y": 148
+                      },
+                      "bottom_right": {
+                        "x": 178,
+                        "y": 179
+                      },
+                      "bottom_left": {
+                        "x": 64,
+                        "y": 176
+                      },
+                      "width": 114,
+                      "height": 29.5
+                    },
+                    "confidence": 1
+                  },
+                  {
+                    "text": "notice",
+                    "bounds": {
+                      "top_left": {
+                        "x": 184,
+                        "y": 148
+                      },
+                      "top_right": {
+                        "x": 265,
+                        "y": 148
+                      },
+                      "bottom_right": {
+                        "x": 265,
+                        "y": 180
+                      },
+                      "bottom_left": {
+                        "x": 184,
+                        "y": 179
+                      },
+                      "width": 81,
+                      "height": 31.5
+                    },
+                    "confidence": 1
+                  },
+                  {
+                    "text": "for",
+                    "bounds": {
+                      "top_left": {
+                        "x": 272,
+                        "y": 148
+                      },
+                      "top_right": {
+                        "x": 310,
+                        "y": 148
+                      },
+                      "bottom_right": {
+                        "x": 310,
+                        "y": 181
+                      },
+                      "bottom_left": {
+                        "x": 272,
+                        "y": 180
+                      },
+                      "width": 38,
+                      "height": 32.5
+                    },
+                    "confidence": 1
+                  },
+                  {
+                    "text": "product",
+                    "bounds": {
+                      "top_left": {
+                        "x": 316,
+                        "y": 148
+                      },
+                      "top_right": {
+                        "x": 419,
+                        "y": 148
+                      },
+                      "bottom_right": {
+                        "x": 419,
+                        "y": 182
+                      },
+                      "bottom_left": {
+                        "x": 316,
+                        "y": 181
+                      },
+                      "width": 103,
+                      "height": 33.5
+                    },
+                    "confidence": 1
+                  },
+                  {
+                    "text": "testing",
+                    "bounds": {
+                      "top_left": {
+                        "x": 426,
+                        "y": 148
+                      },
+                      "top_right": {
+                        "x": 515,
+                        "y": 147
+                      },
+                      "bottom_right": {
+                        "x": 515,
+                        "y": 182
+                      },
+                      "bottom_left": {
+                        "x": 425,
+                        "y": 182
+                      },
+                      "width": 89.5,
+                      "height": 34.5
+                    },
+                    "confidence": 1
+                  }
+                ],
+                "average_confidence": 1,
+                "bounds": {
+                  "top_left": {
+                    "x": 64,
+                    "y": 147
+                  },
+                  "top_right": {
+                    "x": 515,
+                    "y": 147
+                  },
+                  "bottom_right": {
+                    "x": 515,
+                    "y": 182
+                  },
+                  "bottom_left": {
+                    "x": 64,
+                    "y": 182
+                  },
+                  "width": 451,
+                  "height": 32.5
+                }
+              },
+              {
+                "text": "Issued: 2026-09-27",
+                "words": [
+                  {
+                    "text": "Issued:",
+                    "bounds": {
+                      "top_left": {
+                        "x": 65,
+                        "y": 208
+                      },
+                      "top_right": {
+                        "x": 165,
+                        "y": 208
+                      },
+                      "bottom_right": {
+                        "x": 165,
+                        "y": 237
+                      },
+                      "bottom_left": {
+                        "x": 64,
+                        "y": 237
+                      },
+                      "width": 100.5,
+                      "height": 29
+                    },
+                    "confidence": 0.87
+                  },
+                  {
+                    "text": "2026-09-27",
+                    "bounds": {
+                      "top_left": {
+                        "x": 171,
+                        "y": 207
+                      },
+                      "top_right": {
+                        "x": 325,
+                        "y": 206
+                      },
+                      "bottom_right": {
+                        "x": 324,
+                        "y": 237
+                      },
+                      "bottom_left": {
+                        "x": 170,
+                        "y": 237
+                      },
+                      "width": 154,
+                      "height": 30.5
+                    },
+                    "confidence": 0.99
+                  }
+                ],
+                "average_confidence": 0.93,
+                "bounds": {
+                  "top_left": {
+                    "x": 64,
+                    "y": 206
+                  },
+                  "top_right": {
+                    "x": 325,
+                    "y": 206
+                  },
+                  "bottom_right": {
+                    "x": 325,
+                    "y": 237
+                  },
+                  "bottom_left": {
+                    "x": 64,
+                    "y": 237
+                  },
+                  "width": 261,
+                  "height": 30.5
+                }
+              },
+              {
+                "text": "Class trip: 2026-09-29 at 08:30.",
+                "words": [
+                  {
+                    "text": "Class",
+                    "bounds": {
+                      "top_left": {
+                        "x": 63,
+                        "y": 328
+                      },
+                      "top_right": {
+                        "x": 140,
+                        "y": 327
+                      },
+                      "bottom_right": {
+                        "x": 140,
+                        "y": 360
+                      },
+                      "bottom_left": {
+                        "x": 63,
+                        "y": 360
+                      },
+                      "width": 77,
+                      "height": 32.5
+                    },
+                    "confidence": 1
+                  },
+                  {
+                    "text": "trip:",
+                    "bounds": {
+                      "top_left": {
+                        "x": 146,
+                        "y": 327
+                      },
+                      "top_right": {
+                        "x": 202,
+                        "y": 327
+                      },
+                      "bottom_right": {
+                        "x": 202,
+                        "y": 360
+                      },
+                      "bottom_left": {
+                        "x": 146,
+                        "y": 360
+                      },
+                      "width": 56,
+                      "height": 33
+                    },
+                    "confidence": 0.99
+                  },
+                  {
+                    "text": "2026-09-29",
+                    "bounds": {
+                      "top_left": {
+                        "x": 208,
+                        "y": 327
+                      },
+                      "top_right": {
+                        "x": 364,
+                        "y": 326
+                      },
+                      "bottom_right": {
+                        "x": 363,
+                        "y": 359
+                      },
+                      "bottom_left": {
+                        "x": 208,
+                        "y": 360
+                      },
+                      "width": 155.5,
+                      "height": 33
+                    },
+                    "confidence": 0.99
+                  },
+                  {
+                    "text": "at",
+                    "bounds": {
+                      "top_left": {
+                        "x": 371,
+                        "y": 326
+                      },
+                      "top_right": {
+                        "x": 396,
+                        "y": 326
+                      },
+                      "bottom_right": {
+                        "x": 396,
+                        "y": 358
+                      },
+                      "bottom_left": {
+                        "x": 370,
+                        "y": 359
+                      },
+                      "width": 25.5,
+                      "height": 32.5
+                    },
+                    "confidence": 1
+                  },
+                  {
+                    "text": "08:30.",
+                    "bounds": {
+                      "top_left": {
+                        "x": 403,
+                        "y": 326
+                      },
+                      "top_right": {
+                        "x": 488,
+                        "y": 327
+                      },
+                      "bottom_right": {
+                        "x": 488,
+                        "y": 357
+                      },
+                      "bottom_left": {
+                        "x": 402,
+                        "y": 358
+                      },
+                      "width": 85.5,
+                      "height": 31
+                    },
+                    "confidence": 0.99
+                  }
+                ],
+                "average_confidence": 0.99,
+                "bounds": {
+                  "top_left": {
+                    "x": 63,
+                    "y": 326
+                  },
+                  "top_right": {
+                    "x": 488,
+                    "y": 326
+                  },
+                  "bottom_right": {
+                    "x": 488,
+                    "y": 360
+                  },
+                  "bottom_left": {
+                    "x": 63,
+                    "y": 360
+                  },
+                  "width": 425,
+                  "height": 32.5
+                }
+              },
+              {
+                "text": "Return permission slip by 2026-09-28.",
+                "words": [
+                  {
+                    "text": "Return",
+                    "bounds": {
+                      "top_left": {
+                        "x": 64,
+                        "y": 388
+                      },
+                      "top_right": {
+                        "x": 152,
+                        "y": 387
+                      },
+                      "bottom_right": {
+                        "x": 152,
+                        "y": 421
+                      },
+                      "bottom_left": {
+                        "x": 64,
+                        "y": 420
+                      },
+                      "width": 88,
+                      "height": 33
+                    },
+                    "confidence": 0.99
+                  },
+                  {
+                    "text": "permission",
+                    "bounds": {
+                      "top_left": {
+                        "x": 161,
+                        "y": 387
+                      },
+                      "top_right": {
+                        "x": 308,
+                        "y": 386
+                      },
+                      "bottom_right": {
+                        "x": 307,
+                        "y": 421
+                      },
+                      "bottom_left": {
+                        "x": 161,
+                        "y": 421
+                      },
+                      "width": 146.5,
+                      "height": 34.5
+                    },
+                    "confidence": 0.99
+                  },
+                  {
+                    "text": "slip",
+                    "bounds": {
+                      "top_left": {
+                        "x": 319,
+                        "y": 386
+                      },
+                      "top_right": {
+                        "x": 363,
+                        "y": 386
+                      },
+                      "bottom_right": {
+                        "x": 363,
+                        "y": 421
+                      },
+                      "bottom_left": {
+                        "x": 319,
+                        "y": 421
+                      },
+                      "width": 44,
+                      "height": 35
+                    },
+                    "confidence": 0.99
+                  },
+                  {
+                    "text": "by",
+                    "bounds": {
+                      "top_left": {
+                        "x": 371,
+                        "y": 386
+                      },
+                      "top_right": {
+                        "x": 406,
+                        "y": 386
+                      },
+                      "bottom_right": {
+                        "x": 405,
+                        "y": 421
+                      },
+                      "bottom_left": {
+                        "x": 370,
+                        "y": 421
+                      },
+                      "width": 35,
+                      "height": 35
+                    },
+                    "confidence": 1
+                  },
+                  {
+                    "text": "2026-09-28.",
+                    "bounds": {
+                      "top_left": {
+                        "x": 413,
+                        "y": 386
+                      },
+                      "top_right": {
+                        "x": 578,
+                        "y": 386
+                      },
+                      "bottom_right": {
+                        "x": 577,
+                        "y": 420
+                      },
+                      "bottom_left": {
+                        "x": 412,
+                        "y": 421
+                      },
+                      "width": 165,
+                      "height": 34.5
+                    },
+                    "confidence": 0.99
+                  }
+                ],
+                "average_confidence": 0.99,
+                "bounds": {
+                  "top_left": {
+                    "x": 64,
+                    "y": 386
+                  },
+                  "top_right": {
+                    "x": 578,
+                    "y": 386
+                  },
+                  "bottom_right": {
+                    "x": 578,
+                    "y": 421
+                  },
+                  "bottom_left": {
+                    "x": 64,
+                    "y": 421
+                  },
+                  "width": 514,
+                  "height": 34.5
+                }
+              },
+              {
+                "text": "Bring water bottle and packed lunch.",
+                "words": [
+                  {
+                    "text": "Bring",
+                    "bounds": {
+                      "top_left": {
+                        "x": 64,
+                        "y": 448
+                      },
+                      "top_right": {
+                        "x": 134,
+                        "y": 448
+                      },
+                      "bottom_right": {
+                        "x": 134,
+                        "y": 480
+                      },
+                      "bottom_left": {
+                        "x": 64,
+                        "y": 480
+                      },
+                      "width": 70,
+                      "height": 32
+                    },
+                    "confidence": 0.99
+                  },
+                  {
+                    "text": "water",
+                    "bounds": {
+                      "top_left": {
+                        "x": 141,
+                        "y": 448
+                      },
+                      "top_right": {
+                        "x": 216,
+                        "y": 448
+                      },
+                      "bottom_right": {
+                        "x": 215,
+                        "y": 481
+                      },
+                      "bottom_left": {
+                        "x": 141,
+                        "y": 480
+                      },
+                      "width": 74.5,
+                      "height": 32.5
+                    },
+                    "confidence": 1
+                  },
+                  {
+                    "text": "bottle",
+                    "bounds": {
+                      "top_left": {
+                        "x": 222,
+                        "y": 448
+                      },
+                      "top_right": {
+                        "x": 299,
+                        "y": 448
+                      },
+                      "bottom_right": {
+                        "x": 298,
+                        "y": 481
+                      },
+                      "bottom_left": {
+                        "x": 222,
+                        "y": 481
+                      },
+                      "width": 76.5,
+                      "height": 33
+                    },
+                    "confidence": 1
+                  },
+                  {
+                    "text": "and",
+                    "bounds": {
+                      "top_left": {
+                        "x": 308,
+                        "y": 448
+                      },
+                      "top_right": {
+                        "x": 356,
+                        "y": 448
+                      },
+                      "bottom_right": {
+                        "x": 356,
+                        "y": 481
+                      },
+                      "bottom_left": {
+                        "x": 307,
+                        "y": 481
+                      },
+                      "width": 48.5,
+                      "height": 33
+                    },
+                    "confidence": 1
+                  },
+                  {
+                    "text": "packed",
+                    "bounds": {
+                      "top_left": {
+                        "x": 363,
+                        "y": 448
+                      },
+                      "top_right": {
+                        "x": 463,
+                        "y": 448
+                      },
+                      "bottom_right": {
+                        "x": 463,
+                        "y": 481
+                      },
+                      "bottom_left": {
+                        "x": 363,
+                        "y": 481
+                      },
+                      "width": 100,
+                      "height": 33
+                    },
+                    "confidence": 0.99
+                  },
+                  {
+                    "text": "lunch.",
+                    "bounds": {
+                      "top_left": {
+                        "x": 470,
+                        "y": 448
+                      },
+                      "top_right": {
+                        "x": 554,
+                        "y": 448
+                      },
+                      "bottom_right": {
+                        "x": 553,
+                        "y": 480
+                      },
+                      "bottom_left": {
+                        "x": 470,
+                        "y": 481
+                      },
+                      "width": 83.5,
+                      "height": 32.5
+                    },
+                    "confidence": 0.99
+                  }
+                ],
+                "average_confidence": 1,
+                "bounds": {
+                  "top_left": {
+                    "x": 64,
+                    "y": 448
+                  },
+                  "top_right": {
+                    "x": 554,
+                    "y": 448
+                  },
+                  "bottom_right": {
+                    "x": 554,
+                    "y": 481
+                  },
+                  "bottom_left": {
+                    "x": 64,
+                    "y": 481
+                  },
+                  "width": 490,
+                  "height": 33
+                }
+              },
+              {
+                "text": "Contact the teacher if you have questions.",
+                "words": [
+                  {
+                    "text": "Contact",
+                    "bounds": {
+                      "top_left": {
+                        "x": 63,
+                        "y": 567
+                      },
+                      "top_right": {
+                        "x": 167,
+                        "y": 567
+                      },
+                      "bottom_right": {
+                        "x": 166,
+                        "y": 600
+                      },
+                      "bottom_left": {
+                        "x": 62,
+                        "y": 598
+                      },
+                      "width": 104,
+                      "height": 32
+                    },
+                    "confidence": 0.99
+                  },
+                  {
+                    "text": "the",
+                    "bounds": {
+                      "top_left": {
+                        "x": 174,
+                        "y": 567
+                      },
+                      "top_right": {
+                        "x": 218,
+                        "y": 567
+                      },
+                      "bottom_right": {
+                        "x": 217,
+                        "y": 600
+                      },
+                      "bottom_left": {
+                        "x": 173,
+                        "y": 600
+                      },
+                      "width": 44,
+                      "height": 33
+                    },
+                    "confidence": 1
+                  },
+                  {
+                    "text": "teacher",
+                    "bounds": {
+                      "top_left": {
+                        "x": 225,
+                        "y": 566
+                      },
+                      "top_right": {
+                        "x": 327,
+                        "y": 566
+                      },
+                      "bottom_right": {
+                        "x": 326,
+                        "y": 601
+                      },
+                      "bottom_left": {
+                        "x": 224,
+                        "y": 600
+                      },
+                      "width": 102,
+                      "height": 34.5
+                    },
+                    "confidence": 1
+                  },
+                  {
+                    "text": "if",
+                    "bounds": {
+                      "top_left": {
+                        "x": 333,
+                        "y": 566
+                      },
+                      "top_right": {
+                        "x": 349,
+                        "y": 566
+                      },
+                      "bottom_right": {
+                        "x": 348,
+                        "y": 601
+                      },
+                      "bottom_left": {
+                        "x": 333,
+                        "y": 601
+                      },
+                      "width": 15.5,
+                      "height": 35
+                    },
+                    "confidence": 1
+                  },
+                  {
+                    "text": "you",
+                    "bounds": {
+                      "top_left": {
+                        "x": 355,
+                        "y": 566
+                      },
+                      "top_right": {
+                        "x": 406,
+                        "y": 566
+                      },
+                      "bottom_right": {
+                        "x": 405,
+                        "y": 601
+                      },
+                      "bottom_left": {
+                        "x": 355,
+                        "y": 601
+                      },
+                      "width": 50.5,
+                      "height": 35
+                    },
+                    "confidence": 1
+                  },
+                  {
+                    "text": "have",
+                    "bounds": {
+                      "top_left": {
+                        "x": 413,
+                        "y": 567
+                      },
+                      "top_right": {
+                        "x": 481,
+                        "y": 567
+                      },
+                      "bottom_right": {
+                        "x": 481,
+                        "y": 601
+                      },
+                      "bottom_left": {
+                        "x": 413,
+                        "y": 601
+                      },
+                      "width": 68,
+                      "height": 34
+                    },
+                    "confidence": 0.99
+                  },
+                  {
+                    "text": "questions.",
+                    "bounds": {
+                      "top_left": {
+                        "x": 488,
+                        "y": 567
+                      },
+                      "top_right": {
+                        "x": 630,
+                        "y": 567
+                      },
+                      "bottom_right": {
+                        "x": 630,
+                        "y": 601
+                      },
+                      "bottom_left": {
+                        "x": 488,
+                        "y": 601
+                      },
+                      "width": 142,
+                      "height": 34
+                    },
+                    "confidence": 0.99
+                  }
+                ],
+                "average_confidence": 1,
+                "bounds": {
+                  "top_left": {
+                    "x": 62,
+                    "y": 566
+                  },
+                  "top_right": {
+                    "x": 630,
+                    "y": 566
+                  },
+                  "bottom_right": {
+                    "x": 630,
+                    "y": 601
+                  },
+                  "bottom_left": {
+                    "x": 62,
+                    "y": 601
+                  },
+                  "width": 568,
+                  "height": 34
+                }
+              }
+            ],
+            "page": 1,
+            "width": 1100,
+            "height": 760
+          }
+        ],
+        "width": 1100,
+        "height": 760
+      }
+    },
+    {
+      "name": "classification",
+      "result": {
+        "predictions": [
+          "title"
+        ]
+      }
+    },
+    {
+      "name": "classification",
+      "result": {
+        "predictions": [
+          [
+            "title",
+            "kind",
+            "date",
+            "time",
+            "notes"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "classification",
+      "result": {
+        "predictions": [
+          [
+            "title",
+            "kind",
+            "date",
+            "time",
+            "notes"
+          ]
+        ]
+      }
+    }
+  ],
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\"schema_version\":\"tomorrow.v1\",\"summary\":\"Maple School has a class trip on 2026-09-29. Permission slips must be returned by 2026-09-28. Students need to bring a water bottle and packed lunch.\",\"tasks\":[{\"title\":{\"value\":\"Return permission slip\",\"quote\":\"Return permission slip by 2026-09-28.\",\"confidence\":1},\"kind\":\"do\",\"date\":{\"value\":\"2026-09-28\",\"quote\":\"2026-09-28\",\"confidence\":1},\"time\":{\"value\":null,\"quote\":null,\"confidence\":0},\"notes\":\"Deadline for return of permission slip.\"},{\"title\":{\"value\":\"Bring water bottle and packed lunch\",\"quote\":\"Bring water bottle and packed lunch.\",\"confidence\":1},\"kind\":\"bring\",\"date\":{\"value\":\"2026-09-29\",\"quote\":\"Class trip: 2026-09-29\",\"confidence\":0.9},\"time\":{\"value\":\"08:30\",\"quote\":\"08:30\",\"confidence\":1},\"notes\":\"Items needed for the class trip.\"},{\"title\":{\"value\":\"Class trip\",\"quote\":\"Class trip: 2026-09-29 at 08:30.\",\"confidence\":1},\"kind\":\"event\",\"date\":{\"value\":\"2026-09-29\",\"quote\":\"2026-09-29\",\"confidence\":1},\"time\":{\"value\":\"08:30\",\"quote\":\"08:30\",\"confidence\":1},\"notes\":\"Class trip event. Contact teacher for questions.\"}]}"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ]
+}
