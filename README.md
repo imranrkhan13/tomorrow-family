@@ -21,7 +21,7 @@ Public MIT source: https://github.com/imranrkhan13/tomorrow-family
 Original notices and tasks persist in IndexedDB on the current browser/device.
 The library supports search and child filters. Manual reminders and local notice
 saving work without AI access. Download your data as JSON, including original files.
-This version exports backups but does not yet provide a restore UI.
+Settings & connection can restore a version 1 JSON backup on this device. Restore validates the entire file and replaces local data in one transaction only after confirmation; download the current data first. It does not change server cache records or make provider calls.
 
 ## Run locally
 
