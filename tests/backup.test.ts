@@ -1,0 +1,10 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {parseBackup} from '../src/backup.js';
+const notice={id:'notice-1',name:'Trip',child:'A',createdAt:'2026-09-28T16:00:00.000Z',mime:'audio/wav',text:'',file:{mime:'audio/wav',base64:'UklGRg=='},summary:'',status:'saved'};
+const task={id:'task-1',noticeId:'notice-1',child:'A',title:'Permission slip',kind:'do',date:'2026-10-09',time:null,notes:'',status:'confirmed',done:false,original:null};
+const payload={version:1,exportedAt:'2026-09-28T16:00:00.000Z',notices:[notice],tasks:[task]};
+test('valid backup restores original file bytes and reminder',async()=>{const result=await parseBackup(JSON.stringify(payload));assert.equal(result.notices[0].file?.type,'audio/wav');assert.equal(result.notices[0].file?.size,4);assert.equal(result.tasks[0].title,'Permission slip');});
+test('invalid JSON, unsupported versions, and extra fields are rejected',async()=>{await assert.rejects(parseBackup('{'),/valid JSON/);await assert.rejects(parseBackup(JSON.stringify({...payload,version:2})),/valid Tomorrow/);await assert.rejects(parseBackup(JSON.stringify({...payload,apiKey:'stolen'})),/valid Tomorrow/);});
+test('duplicate and dangling IDs and impossible dates are rejected before a write',async()=>{await assert.rejects(parseBackup(JSON.stringify({...payload,notices:[notice,notice]})),/duplicate notices/);await assert.rejects(parseBackup(JSON.stringify({...payload,tasks:[{...task,noticeId:'absent'}]})),/missing notice/);await assert.rejects(parseBackup(JSON.stringify({...payload,tasks:[{...task,date:'2026-02-30'}]})),/invalid date/);});
+test('oversized and malformed original files are rejected',async()=>{await assert.rejects(parseBackup(JSON.stringify({...payload,notices:[{...notice,file:{...notice.file,base64:'abc#'}}]})),/valid Tomorrow/);await assert.rejects(parseBackup(JSON.stringify({...payload,notices:[{...notice,file:{...notice.file,base64:'a'.repeat(4_000_004)}}]})),/valid Tomorrow/);});
