@@ -19,4 +19,4 @@ export async function checkJev(req:IncomingMessage,res:ServerResponse,local=fals
  if(!result.fields.some(f=>f.verified&&f.value.trim()&&f.quote.includes(f.value))){reply(200,{status:'skipped',error:'No linked source text to check.'});return;}
  await budget.reserve(id);try{const output=await reviewTextWithJev(result,key,transport);if(output.tokens>100_000||output.tokens<0||!Number.isSafeInteger(output.tokens))throw Error('Jev usage exceeded reservation; halted.');await budget.finish(id,output.findings,output.tokens);reply(200,{status:'ok',findings:output.findings,cacheHit:false});}catch(e){const message=e instanceof Error?e.message:'Jev result uncertain';await budget.fail(id,message);reply(502,{status:'failed',error:'Jev check unavailable; no retry. Check every field yourself.'});}
  }catch(e){reply(409,{error:e instanceof Error?e.message:'Jev check unavailable. No call.'});}
-}}
+}
