@@ -6,7 +6,7 @@ import type {IntakeLinked} from '../src/intake.js';
 import {awaitSavedResult,resumeRecoveredResult,type Lookup} from './recovery.js';
 
 import {requestLock,jevState,needsSavedLookup} from './request-state.js';
-const jevRequests=requestLock(),uploadRequests=requestLock();
+const jevRequests=requestLock(),levRequests=requestLock(),uploadRequests=requestLock();
 const sessionItems=new Set<string>();
 const root=document.querySelector<HTMLDivElement>('#app')!;
 const esc=(value:unknown)=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
@@ -62,10 +62,22 @@ async function checkJevAfterIntake(item:Item,readonly=false){
  }finally{jevRequests.release(item.id);await checkLevAfterIntake(item);}
 }
 async function checkLevAfterIntake(item:Item){
- const saved=(await db.all()).find(x=>x.id===item.id)??item;
- if(saved.levStatus)return;
- // No live service: do not call an unconfigured endpoint or invent a score.
- await db.put({...saved,levStatus:'unknown'});await refresh();
+ if(!levRequests.acquire(item.id))return;
+ try{
+  const saved=(await db.all()).find(x=>x.id===item.id)??item;
+  // Never repeat a pending, completed or uncertain request.
+  if(saved.levStatus)return;
+  if(saved.result?.useCase!=='prescription'||!saved.result.fields.some(f=>f.verified&&f.value.trim()&&f.quote.includes(f.value))){await db.put({...saved,levStatus:'skipped'});return;}
+  await db.put({...saved,levStatus:'pending'});
+  const r=await fetch('/api/lev-check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(await payload(saved)),signal:AbortSignal.timeout(40000)});
+  const data=await r.json() as {status:string;findings?:Item['lev'];error?:string};
+  const current=(await db.all()).find(x=>x.id===item.id)??saved;
+  const state=jevState(data);
+  await db.put({...current,lev:state==='ok'?data.findings:undefined,levStatus:state});
+ }catch{
+  const current=(await db.all()).find(x=>x.id===item.id)??item;
+  await db.put({...current,levStatus:'unknown'});
+ }finally{levRequests.release(item.id);await refresh();}
 }
 async function run(item:Item){if(item.state==='failed')return;render();status(item.kind==='audio'?'Transcribing audio, then extracting fields. A lost response only triggers read-only checks.':'Interfaze is reading once. A lost response only triggers read-only checks.');try{const r=await fetch('/api/intake',{method:'POST',headers:{'Content-Type':'application/json','X-Tomorrow-Device':deviceId()},body:JSON.stringify(await payload(item)),signal:AbortSignal.timeout(300000)});const data=await r.json() as IntakeLinked&{error?:string;status?:string};if(data.status==='pending')throw Error(data.error??'INTAKE_PENDING');if(!r.ok)throw Error(data.error??`Request failed (${r.status})`);const ready={...item,state:'review' as const,result:data,error:undefined};await db.put(ready);await refresh();await checkJevAfterIntake(ready);}catch(e){const message=e instanceof Error?e.message:'Request failed';if(needsSavedLookup(e)){status('Response lost. Checking saved result without another call...');const entry=await awaitSavedResult(()=>lookup(item) as Promise<Lookup>,ms=>new Promise(resolve=>setTimeout(resolve,ms)),55,5000);if(entry.status==='ok'&&entry.result){await resumeRecoveredResult({status:entry.status,result:entry.result as unknown as IntakeLinked},async result=>{await db.put({...item,state:'review',result,error:undefined});await refresh();},result=>checkJevAfterIntake({...item,state:'review',result}));}else{await db.put({...item,state:'failed',error:entry.error??'Outcome uncertain. Check saved result later; do not resubmit.'});await refresh();status('Outcome uncertain. Check saved result later.');}}else{await db.put({...item,state:'failed',error:message});await refresh();status(message);}}}
 async function start(){await db.init();screen='upload';selected=null;await refresh();}

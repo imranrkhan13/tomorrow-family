@@ -35,9 +35,19 @@ jobs:
                   print(r.text[-12000:].replace(token,'[redacted]'))
               raise RuntimeError('Space not ready; no score test made')
           if str(runtime.hardware)!='zero-a10g':raise RuntimeError('Free hardware not confirmed')
-          from gradio_client import Client
-          client=Client(repo,token=token,verbose=False,analytics_enabled=False)
-          payload={'state':'Fictional label: SampleOnly BD','questions':{'f0':{'type':'noul','instructions':'Does this text explicitly state BD?'}}}
-          result=client.predict(payload,api_name='/score')
-          print('Fictional test result:',json.dumps(result))
+          import time
+          payload={'state':'Fictional label: SampleOnly BD','questions':{'f0':{'type':'noul','instructions':'Does this text explicitly state BD?'}},'model':'english'}
+          host='https://phineas8-tomorrow-lev.hf.space';headers={'X-HF-Authorization':'Bearer '+token,'Content-Type':'application/json'}
+          deadline=time.monotonic()+35
+          submitted=requests.post(host+'/gradio_api/call/score',headers=headers,json={'data':[payload]},timeout=max(0.1,deadline-time.monotonic()));submitted.raise_for_status()
+          event=submitted.json()['event_id']
+          collected=requests.get(host+'/gradio_api/call/score/'+event,headers=headers,timeout=max(0.1,deadline-time.monotonic()));collected.raise_for_status()
+          completed=[block for block in collected.text.split('\n\n') if 'event: complete' in block]
+          if not completed:raise RuntimeError('No complete event. No retry.')
+          line=next(line for line in completed[0].splitlines() if line.startswith('data: '))
+          result=json.loads(line[6:])[0]
+          assert isinstance(result['answers']['f0']['noul'],(float,int)) and 0<=result['answers']['f0']['noul']<=1
+          assert result['usage']['input_tokens']>=0
+          print('Direct HTTP fictional test result:',json.dumps(result))
+          print('HTTP event contract passed within 35 seconds; one POST, same-event GET, no retry.')
           PY
