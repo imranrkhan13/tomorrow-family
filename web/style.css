@@ -8,3 +8,4 @@
 @media(max-height:720px){.foot{font-size:8px}.original{font-size:10px;margin-top:7px;padding-top:7px}}
 @media(min-width:601px){.app{gap:12px;padding-top:14px}main{gap:10px}.card-head{padding-bottom:10px}.field{padding-top:8px;padding-bottom:8px}.field-list{margin:10px 0}.pipeline{margin-top:12px}.result-heading{margin-top:10px}.pagination{margin-bottom:10px}.card{padding-top:15px;padding-bottom:15px}}
 @media(max-height:720px){.app{gap:8px;padding-top:8px}main{gap:7px}.field{padding:7px 9px;gap:4px 8px}.field-list{margin:7px 0;gap:6px}.pipeline button{padding-top:5px;padding-bottom:5px}.card-head{padding-bottom:8px}.safety-note{margin-top:7px}}
+.review-screen .intro{display:none}.card>#saved-jev-check{min-height:28px;padding:6px 10px;margin-top:6px;font-size:10px}
