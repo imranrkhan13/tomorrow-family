@@ -3,8 +3,8 @@ import {z} from 'zod';
 import type {IntakeLinked} from '../src/intake.js';
 import type {GateFinding} from './jev-gate.js';
 const response=z.object({answers:z.record(z.string(),z.object({type:z.literal('noul'),noul:z.number().min(0).max(1)})),usage:z.object({input_tokens:z.number().int().nonnegative(),output_tokens:z.number().int().nonnegative()}),truncated:z.record(z.string(),z.unknown()).optional()});
-export async function reviewTextWithLev(result:IntakeLinked,key:string,transport:typeof fetch){
- const {text,fields}=textCheckInput(result);
+export async function reviewTextWithLev(result:IntakeLinked,key:string,transport:typeof fetch,allowUnlinked=true){
+ const {text,fields}=textCheckInput(result,allowUnlinked);
  if(!fields.length||!text.trim())return{findings:result.fields.map(f=>({field:f.name,reading:f.value,status:'needs_check' as const,reason:'No extracted text or candidate value',score:null})),tokens:0};
  if(text.length>1600)throw Error('Source is too long for Lev. No call.');
  const questions=Object.fromEntries(fields.map((f,i)=>[`f${i}`,{type:'noul',instructions:`Does the supplied text explicitly state ${JSON.stringify(f.value)} as ${f.name}? Answer yes only for an exact text reading, not a medical inference.`}]));
