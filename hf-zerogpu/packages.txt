@@ -1,0 +1,6 @@
+libicu-dev
+libopenblas-dev
+uuid-dev
+build-essential
+curl
+git
