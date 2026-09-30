@@ -36,3 +36,10 @@ export function reviewPrescription(result:IntakeLinked):IntakeLinked{
  const issues=fields.flatMap(f=>{const issue=readingIssue(f);return issue?[`${f.name}: ${issue}`]:[];});
  return {...result,fields,missing,summary:`${indices.size?`${indices.size} possible medicine rows. `:''}${fields.filter(f=>f.verified).length} possible readings; ${missing.length} unclear or missing details. Check every reading against the original.`,reviewReasons:[...new Set([...result.reviewReasons,...issues])]};
 }
+/** Judge extracted text, including unlinked candidates, without changing source or human flags. */
+export function textCheckInput(result:IntakeLinked){
+ const fields=result.fields.filter(f=>f.value.trim()&&!/[?\[\]]|illegible|unreadable|uncertain|unclear/i.test(f.value));
+ const sources=result.sourceLines?.length?result.sourceLines.map(e=>e.quote):result.fields.map(f=>f.quote);
+ const text=[...new Set(sources.filter(s=>s.trim()))].join('\n');
+ return {text,fields};
+}
