@@ -1,5 +1,5 @@
 import './style.css';
-import {reviewPrescription,prescriptionLabel,readingIssue} from '../src/prescription.js';
+import {reviewPrescription,prescriptionLabel,readingIssue,textCheckInput} from '../src/prescription.js';
 import * as db from './intake-db.js';
 import type {Item} from './intake-db.js';
 import type {IntakeLinked} from '../src/intake.js';
@@ -19,7 +19,7 @@ function status(message:string){message=message.replace(/Interfaze/g,'The reader
 function fieldKey(f:IntakeLinked['fields'][number],index:number){return `${index}:${f.name}`;}
 function providerCheckMarkup(name:string,state:Item['jevStatus'],findings:Item['jev']){
  const checked=(findings??[]).filter(f=>f.score!==null&&Number.isFinite(f.score)&&f.score>=0&&f.score<=1);
- const message=state==='ok'?(checked.length?'Text check complete':'Complete · no score returned'):state==='skipped'?'Skipped · no linked text':state==='pending'?'Checking text…':state==='failed'?'Failed · no retry':state==='unknown'?'No confirmed result':state==='missing'?'No saved result':'Not checked yet';
+ const message=state==='ok'?(checked.length?'Text check complete':'Complete · no score returned'):state==='skipped'?'Skipped · no text or values':state==='pending'?'Checking text…':state==='failed'?'Failed · no retry':state==='unknown'?'No confirmed result':state==='missing'?'No saved result':'Not checked yet';
  return `<div class="provider-check" data-provider="${esc(name)}"><h4>${esc(name)}</h4><p>${esc(message)}</p>${state==='ok'&&checked.length?`<ul>${checked.map(f=>`<li><span>${esc(prescriptionLabel(f.field).replace(/ \d+$/,'').replace(' (written shorthand)',''))}<br>${esc(f.reading)}</span><b>${(f.score!*100).toFixed(1)}%<small>${f.status==='text_agrees'?'Text agrees':'Needs check'}</small></b></li>`).join('')}</ul>`:'<span class="no-score">No confidence score</span>'}</div>`;
 }
 function resultMarkup(item:Item){
@@ -79,7 +79,7 @@ async function checkLevAfterIntake(item:Item){
   const saved=(await db.all()).find(x=>x.id===item.id)??item;
   // Never repeat a pending, completed or uncertain request.
   if(saved.levStatus)return;
-  if(saved.result?.useCase!=='prescription'||!saved.result.fields.some(f=>f.verified&&f.value.trim()&&f.quote.includes(f.value))){await db.put({...saved,levStatus:'skipped'});return;}
+  if(saved.result?.useCase!=='prescription'||!textCheckInput(saved.result).text.trim()||!textCheckInput(saved.result).fields.length){await db.put({...saved,levStatus:'skipped'});return;}
   await db.put({...saved,levStatus:'pending'});
   const r=await fetch('/api/lev-check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(await payload(saved)),signal:AbortSignal.timeout(40000)});
   const data=await r.json() as {status:string;findings?:Item['lev'];error?:string};
