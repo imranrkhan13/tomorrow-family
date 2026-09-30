@@ -2,11 +2,22 @@ import {z} from 'zod';
 import {reviewPrescription} from '../src/prescription.js';
 import {inputHash,validateInput,type Input,type Config} from './extraction.js';
 import {intakeSchema,linkIntake,type IntakeLinked} from '../src/intake.js';
-import type {Store} from './store.js';
+import type {Entry,Store} from './store.js';
 export const intakeKey=(input:Input)=>inputHash(input)+':intake.v1';
 const responseSchema=z.object({choices:z.array(z.object({message:z.object({content:z.string()}),finish_reason:z.string().optional()})).min(1),usage:z.object({prompt_tokens:z.number().int().nonnegative(),completion_tokens:z.number().int().nonnegative()}),precontext:z.unknown().optional()});
+/** Rebuild evidence from saved provider metadata, never make another provider call. */
+export function savedIntake(entry:Entry,input:Input):IntakeLinked{
+ const saved=entry.result as IntakeLinked;
+ const raw=responseSchema.safeParse(entry.raw);
+ if(raw.success){try{
+  const decoded=intakeSchema.parse(JSON.parse(raw.data.choices[0].message.content));
+  const text=[input.text,saved.transcript].filter(Boolean).join('\n');
+  return reviewPrescription({...saved,...decoded,...linkIntake(decoded,raw.data.precontext,text),cacheHit:true});
+ }catch{/* Keep the saved result if old raw metadata cannot be decoded. */}}
+ return reviewPrescription({...saved,cacheHit:true});
+}
 export async function intake(input:Input,store:Store,config:Config,transport:typeof fetch=fetch,deviceId=''):Promise<IntakeLinked>{
- validateInput(input);const key=intakeKey(input);const cached=await store.lookup(key);if(cached){if(cached.status==='ok')return reviewPrescription({...cached.result as IntakeLinked,cacheHit:true});throw Error(cached.status==='pending'?'INTAKE_PENDING: this file is still processing. Check saved result; never resend.':cached.error??'This intake request failed. No retry will be made.');}
+ validateInput(input);const key=intakeKey(input);const cached=await store.lookup(key);if(cached){if(cached.status==='ok')return savedIntake(cached,input);throw Error(cached.status==='pending'?'INTAKE_PENDING: this file is still processing. Check saved result; never resend.':cached.error??'This intake request failed. No retry will be made.');}
  if(!config.key||!config.freeConfirmed)throw Error('SETUP_REQUIRED: free-credit budget not enabled.');
  if(!Number.isFinite(config.tokenCap)||config.tokenCap<=0||!Number.isFinite(config.creditCap)||config.creditCap<=0||config.creditCap>5)throw Error('SETUP_REQUIRED: invalid credit cap.');
  const isAudio=!!input.file?.mime.startsWith('audio/');let transcript:string|null=null,priorTokens=0,priorUsd=0;

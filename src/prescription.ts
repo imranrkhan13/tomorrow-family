@@ -6,7 +6,7 @@ export function prescriptionLabel(name:string){const match=fieldPattern.exec(nam
 /** Shape checks are not medical validation. Never repair a guessed letter or unit. */
 export function readingIssue(field:IntakeLinked['fields'][number]):string|null{
  const value=field.value.trim();
- if(!value||/[?\[\]]|illegible|unreadable|uncertain/i.test(value))return 'Unclear reading. Ask a pharmacist; do not guess.';
+ if(!value||/[?\[\]]|illegible|unreadable|uncertain|unclear/i.test(value))return 'Unclear reading. Ask a pharmacist; do not guess.';
  if(/^dose_\d+$/.test(field.name)&&!/^\d+(?:\.\d+)?\s*(?:mg|mcg|g|ml|mL|units?|IU)$/i.test(value))return 'Dose needs a number and a clear unit. Do not infer the unit.';
  if(/^duration_\d+$/.test(field.name)&&!/^\d+(?:\.\d+)?\s*(?:d|days?|weeks?|wks?|months?|hours?|hrs?)$/i.test(value))return 'Duration needs a number and a clear time unit. Do not infer the unit.';
  if(/^duration_\d+$/.test(field.name)&&parseFloat(value)<=0)return 'Duration is unclear. Check the original.';
