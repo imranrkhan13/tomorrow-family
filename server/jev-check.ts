@@ -1,3 +1,4 @@
+import {textCheckInput} from '../src/prescription.js';
 import type {IncomingMessage,ServerResponse} from 'node:http';
 import {createHash} from 'node:crypto';
 import {inputSchema,validateInput} from './extraction.js';
@@ -16,7 +17,8 @@ export async function checkJev(req:IncomingMessage,res:ServerResponse,local=fals
  try{const source=await store.lookup(intakeKey(input));if(source?.status!=='ok'){reply(409,{error:'No completed prescription reading; no Jev call.'});return;}
  const result=savedIntake(source,input);if(result.useCase!=='prescription'){reply(409,{error:'Older reading is not eligible for Jev.'});return;}
  const id=createHash('sha256').update('jev.v1:'+intakeKey(input)).digest('hex');const existing=await budget.lookup(id);if(existing){reply(200,existing.status==='ok'?{status:'ok',findings:existing.findings,cacheHit:true}:{status:existing.status,error:existing.error??'Check pending; no repeat.'});return;}if(req.headers['x-tomorrow-jev-readonly']==='true'){reply(200,{status:'missing',error:'No saved Jev result. No provider call.'});return;}
- if(!result.fields.some(f=>f.verified&&f.value.trim()&&f.quote.includes(f.value))){reply(200,{status:'skipped',error:'No linked source text to check.'});return;}
+ if(process.env.UNLINKED_TEXT_CHECK_INPUT_HASH!==result.inputHash&&!result.fields.some(f=>f.verified&&f.value.trim()&&f.quote.includes(f.value))){reply(200,{status:'skipped',error:'Unlinked text checks await approval. No provider call.'});return;}
+ const context=textCheckInput(result);if(!context.text.trim()||!context.fields.length){reply(200,{status:'skipped',error:'No extracted text or candidate values to check.'});return;}if(context.text.length>8000){reply(409,{error:'Source is too long for Jev. No call.'});return;}
  await budget.reserve(id);try{const output=await reviewTextWithJev(result,key,transport);if(output.tokens>100_000||output.tokens<0||!Number.isSafeInteger(output.tokens))throw Error('Jev usage exceeded reservation; halted.');await budget.finish(id,output.findings,output.tokens);reply(200,{status:'ok',findings:output.findings,cacheHit:false});}catch(e){const message=e instanceof Error?e.message:'Jev result uncertain';await budget.fail(id,message);reply(502,{status:'failed',error:'Jev check unavailable; no retry. Check every field yourself.'});}
  }catch(e){reply(409,{error:e instanceof Error?e.message:'Jev check unavailable. No call.'});}
                                                                                                                 }
