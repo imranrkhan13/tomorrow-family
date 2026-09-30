@@ -1,6 +1,7 @@
+import type {JevStatus} from './request-state.js';
 import type {IntakeLinked} from '../src/intake.js';
 import type {GateFinding} from '../server/jev-gate.js';
-export type Item={id:string;name:string;kind:'text'|'photo'|'pdf'|'audio';createdAt:string;text:string;file:Blob|null;result:IntakeLinked|null;state:'saved'|'review'|'failed';error?:string;confirmed?:Record<string,{value:string;at:string}>;jev?:GateFinding[];jevStatus?:'ok'|'skipped'|'failed'};
+export type Item={id:string;name:string;kind:'text'|'photo'|'pdf'|'audio';createdAt:string;text:string;file:Blob|null;result:IntakeLinked|null;state:'saved'|'review'|'failed';error?:string;confirmed?:Record<string,{value:string;at:string}>;jev?:GateFinding[];jevStatus?:JevStatus};
 let db:IDBDatabase;
 export function init(){return new Promise<void>((resolve,reject)=>{const r=indexedDB.open('tomorrow-intake-v1',1);r.onupgradeneeded=()=>r.result.createObjectStore('items',{keyPath:'id'});r.onsuccess=()=>{db=r.result;resolve();};r.onerror=()=>reject(r.error);});}
 export function all(){return new Promise<Item[]>((resolve,reject)=>{const r=db.transaction('items').objectStore('items').getAll();r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}

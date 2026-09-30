@@ -6,7 +6,7 @@ import type {Store} from './store.js';
 export const intakeKey=(input:Input)=>inputHash(input)+':intake.v1';
 const responseSchema=z.object({choices:z.array(z.object({message:z.object({content:z.string()}),finish_reason:z.string().optional()})).min(1),usage:z.object({prompt_tokens:z.number().int().nonnegative(),completion_tokens:z.number().int().nonnegative()}),precontext:z.unknown().optional()});
 export async function intake(input:Input,store:Store,config:Config,transport:typeof fetch=fetch,deviceId=''):Promise<IntakeLinked>{
- validateInput(input);const key=intakeKey(input);const cached=await store.lookup(key);if(cached){if(cached.status==='ok')return reviewPrescription({...cached.result as IntakeLinked,cacheHit:true});throw Error(cached.error??'This intake request is unfinished. No retry will be made.');}
+ validateInput(input);const key=intakeKey(input);const cached=await store.lookup(key);if(cached){if(cached.status==='ok')return reviewPrescription({...cached.result as IntakeLinked,cacheHit:true});throw Error(cached.status==='pending'?'INTAKE_PENDING: this file is still processing. Check saved result; never resend.':cached.error??'This intake request failed. No retry will be made.');}
  if(!config.key||!config.freeConfirmed)throw Error('SETUP_REQUIRED: free-credit budget not enabled.');
  if(!Number.isFinite(config.tokenCap)||config.tokenCap<=0||!Number.isFinite(config.creditCap)||config.creditCap<=0||config.creditCap>5)throw Error('SETUP_REQUIRED: invalid credit cap.');
  const isAudio=!!input.file?.mime.startsWith('audio/');let transcript:string|null=null,priorTokens=0,priorUsd=0;
