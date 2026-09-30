@@ -1,3 +1,4 @@
+import spaces
 import os, pathlib, subprocess, tarfile, time, hashlib, json
 import requests
 import gradio as gr
@@ -28,7 +29,7 @@ for file in ['model.safetensors','tokenizer/tokenizer.json','tokenizer/tokenizer
                 for chunk in response.iter_content(1024*1024):out.write(chunk)
 if hashlib.sha256((laya/'model.safetensors').read_bytes()).hexdigest()!='891102d372688fc2a094dac56a384bc537b87c63f21f9f3dac0be2b7cbc8d86c':raise RuntimeError('Checkpoint hash mismatch')
 os.environ['LEV_CHECKPOINTS']=str(laya)
-if not (lev/'data'/'config.json').exists():subprocess.run(['jolt','prepare'],cwd=lev,check=True)
+if not (lev/'data'/'config.edn').exists():subprocess.run(['jolt','prepare'],cwd=lev,check=True)
 server=subprocess.Popen(['jolt','-M:serve','--host','127.0.0.1','--port','8080'],cwd=lev)
 for _ in range(120):
     try:
@@ -37,6 +38,7 @@ for _ in range(120):
     if server.poll() is not None:raise RuntimeError('Lev failed at startup')
     time.sleep(1)
 else:raise RuntimeError('Lev startup timed out')
+@spaces.GPU(duration=30)
 def score(payload):
     if not isinstance(payload,dict):raise gr.Error('Expected JSON object')
     text=payload.get('state','');questions=payload.get('questions',{})
@@ -48,4 +50,4 @@ with gr.Blocks() as demo:
     gr.Markdown('Lev text agreement only. Not handwriting verification or medical advice.')
     data=gr.JSON(label='Fictional linked text only');output=gr.JSON(label='Raw Lev score')
     gr.Button('Check text once').click(score,data,output,api_name='score',concurrency_limit=1)
-demo.launch(server_name='0.0.0.0',server_port=7860,show_error=False)
+demo.launch(server_name='0.0.0.0',server_port=7860,show_error=False,ssr_mode=False)
