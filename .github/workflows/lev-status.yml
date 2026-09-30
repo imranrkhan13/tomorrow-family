@@ -33,7 +33,7 @@ jobs:
               print(r.text[-12000:].replace(token,'[redacted]'))
               raise RuntimeError('Space not ready; no score test made')
           from gradio_client import Client
-          client=Client(repo,hf_token=token,verbose=False)
+          client=Client(repo,token=token,verbose=False,analytics_enabled=False)
           payload={'state':'Fictional label: SampleOnly BD','questions':{'f0':{'type':'noul','instructions':'Does this text explicitly state BD?'}}}
           result=client.predict(payload,api_name='/score')
           print('Fictional test result:',json.dumps(result))
