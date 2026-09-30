@@ -27,6 +27,7 @@ jobs:
           print('Host:',info.host)
           print('Stage:',runtime.stage,'Hardware:',runtime.hardware)
           print('Requested hardware:',runtime.requested_hardware)
+          print('Runtime detail:',runtime.raw)
           if str(runtime.stage)!='RUNNING':
               for kind in ['build','run']:
                   r=requests.get('https://huggingface.co/api/spaces/'+repo+'/logs/'+kind,headers={'Authorization':'Bearer '+token},timeout=20)
