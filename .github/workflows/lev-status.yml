@@ -26,12 +26,14 @@ jobs:
           print('Space URL: https://huggingface.co/spaces/'+repo)
           print('Host:',info.host)
           print('Stage:',runtime.stage,'Hardware:',runtime.hardware)
-          if str(runtime.hardware)!='zero-a10g':raise RuntimeError('Free hardware not confirmed')
+          print('Requested hardware:',runtime.requested_hardware)
           if str(runtime.stage)!='RUNNING':
-              r=requests.get('https://huggingface.co/api/spaces/'+repo+'/logs/build',headers={'Authorization':'Bearer '+token},timeout=20)
-              print('Build log status:',r.status_code)
-              print(r.text[-12000:].replace(token,'[redacted]'))
+              for kind in ['build','run']:
+                  r=requests.get('https://huggingface.co/api/spaces/'+repo+'/logs/'+kind,headers={'Authorization':'Bearer '+token},timeout=20)
+                  print(kind+' log status:',r.status_code)
+                  print(r.text[-12000:].replace(token,'[redacted]'))
               raise RuntimeError('Space not ready; no score test made')
+          if str(runtime.hardware)!='zero-a10g':raise RuntimeError('Free hardware not confirmed')
           from gradio_client import Client
           client=Client(repo,token=token,verbose=False,analytics_enabled=False)
           payload={'state':'Fictional label: SampleOnly BD','questions':{'f0':{'type':'noul','instructions':'Does this text explicitly state BD?'}}}
