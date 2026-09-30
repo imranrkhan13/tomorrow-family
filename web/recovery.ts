@@ -8,3 +8,11 @@ export async function awaitSavedResult(check:()=>Promise<Lookup>,wait:(ms:number
  }
  return {status:'pending',error:'Still processing or outcome uncertain. Check the saved result later; do not resend.'};
 }
+
+/** Resume the first text check only after a completed reading is saved. No extraction write. */
+export async function resumeRecoveredResult<T>(entry:{status:string;result?:T},save:(result:T)=>Promise<void>,checkText:(result:T)=>Promise<void>):Promise<boolean>{
+ if(entry.status!=='ok'||!entry.result)return false;
+ await save(entry.result);
+ await checkText(entry.result);
+ return true;
+}
