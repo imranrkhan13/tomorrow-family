@@ -54,7 +54,7 @@ async function checkJevAfterIntake(item:Item,readonly=false){
   const current=(await db.all()).find(x=>x.id===item.id)??item;
   const state=jevState(data);
   await db.put({...current,jev:state==='ok'?data.findings:undefined,jevStatus:state});
-  status(state==='ok'?'Reading and Jev text check ready. Compare every field with the original.':state==='skipped'?'Reading ready. No linked text for Jev; check every field yourself.':state==='missing'?'No saved Jev result. No repeat call made.':state==='failed'?'Reading ready. Jev could not complete; no retry. Check every field yourself.':'Reading ready. Jev result uncertain; only saved-result checks are allowed.');
+  status(state==='ok'?'Your results are ready. Check every field against the original.':state==='skipped'?'Reading ready. No linked text for Jev; check every field yourself.':state==='missing'?'No saved Jev result. No repeat call made.':state==='failed'?'Reading ready. Jev could not complete; no retry. Check every field yourself.':'Reading ready. Jev result uncertain; only saved-result checks are allowed.');
   stage='fields';fieldPage=0;await refresh();
  }catch{
   const current=(await db.all()).find(x=>x.id===item.id)??item;
