@@ -31,3 +31,4 @@ test('old generic cache and field order remain untouched',()=>{
 });
 
 test('re-review is stable and malformed dose is withheld',()=>{const r=reviewPrescription({...base,fields:[field('medicine_1','Demo'),field('dose_1','10 X'),field('frequency_1','HS'),field('duration_1','3 X')]});assert.equal(r.fields[1].verified,false);assert.deepEqual(reviewPrescription(r),r);});
+test('literal source support never repairs TDS/THS or matches inside a larger token',async()=>{const {sourceStatesValue}=await import('../src/prescription.js');assert.equal(sourceStatesValue('Foley monitor THS','TDS'),false);assert.equal(sourceStatesValue('unclear monitoring','20 days'),false);assert.equal(sourceStatesValue('5 mg BD','5 mg'),true);assert.equal(sourceStatesValue('15 mg','5 mg'),false);assert.equal(sourceStatesValue('notBD','BD'),false);});
