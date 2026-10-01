@@ -43,3 +43,10 @@ export function textCheckInput(result:IntakeLinked,allowUnlinked=true){
  const text=[...new Set(sources.filter(s=>s.trim()))].join('\n');
  return {text,fields};
 }
+
+/** Conservative literal check, not medical validation or fuzzy correction. */
+export function sourceStatesValue(text:string,value:string){
+ const clean=(s:string)=>s.trim().replace(/\s+/g,' ');
+ const source=clean(text),candidate=clean(value);if(!candidate)return false;
+ let at=source.indexOf(candidate);while(at>=0){const before=at?source[at-1]:'',after=source[at+candidate.length]??'';if(!/[a-z0-9]/i.test(before)&&!/[a-z0-9]/i.test(after))return true;at=source.indexOf(candidate,at+1);}return false;
+   }
