@@ -36,3 +36,17 @@ export function reviewPrescription(result:IntakeLinked):IntakeLinked{
  const issues=fields.flatMap(f=>{const issue=readingIssue(f);return issue?[`${f.name}: ${issue}`]:[];});
  return {...result,fields,missing,summary:`${indices.size?`${indices.size} possible medicine rows. `:''}${fields.filter(f=>f.verified).length} possible readings; ${missing.length} unclear or missing details. Check every reading against the original.`,reviewReasons:[...new Set([...result.reviewReasons,...issues])]};
 }
+/** Judge extracted text, including unlinked candidates, without changing source or human flags. */
+export function textCheckInput(result:IntakeLinked,allowUnlinked=true){
+ const fields=result.fields.filter(f=>(allowUnlinked||f.verified&&f.quote.includes(f.value))&&f.value.trim()&&!/[?\[\]]|illegible|unreadable|uncertain|unclear/i.test(f.value));
+ const sources=allowUnlinked?(result.sourceLines?.length?result.sourceLines.map(e=>e.quote):result.fields.map(f=>f.quote)):fields.map(f=>f.quote);
+ const text=[...new Set(sources.filter(s=>s.trim()))].join('\n');
+ return {text,fields};
+}
+
+/** Conservative literal check, not medical validation or fuzzy correction. */
+export function sourceStatesValue(text:string,value:string){
+ const clean=(s:string)=>s.trim().replace(/\s+/g,' ');
+ const source=clean(text),candidate=clean(value);if(!candidate)return false;
+ let at=source.indexOf(candidate);while(at>=0){const before=at?source[at-1]:'',after=source[at+candidate.length]??'';if(!/[a-z0-9]/i.test(before)&&!/[a-z0-9]/i.test(after))return true;at=source.indexOf(candidate,at+1);}return false;
+   }
