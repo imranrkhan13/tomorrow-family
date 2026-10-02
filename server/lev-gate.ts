@@ -5,7 +5,8 @@ import type {GateFinding} from './jev-gate.js';
 const response=z.object({answers:z.record(z.string(),z.object({type:z.literal('noul'),noul:z.number().min(0).max(1)})),usage:z.object({input_tokens:z.number().int().nonnegative(),output_tokens:z.number().int().nonnegative()}),truncated:z.record(z.string(),z.unknown()).optional()});
 /** Diagnostics keep only fixed wording and event names: never provider text, prompts, tokens or source text. */
 function timedOut(e:unknown){return e instanceof Error&&(e.name==='TimeoutError'||e.name==='AbortError');}
-export async function reviewTextWithLev(result:IntakeLinked,key:string,transport:typeof fetch,allowUnlinked=true){
+/** onAccepted stores the queue event id before the long wait. With recoverEventId nothing is submitted: it only reads that event's output. */
+export async function reviewTextWithLev(result:IntakeLinked,key:string,transport:typeof fetch,allowUnlinked=true,onAccepted?:(eventId:string)=>Promise<void>,recoverEventId?:string){
  const {text,fields}=textCheckInput(result,allowUnlinked);
  if(!fields.length||!text.trim())return{findings:result.fields.map(f=>({field:f.name,reading:f.value,status:'needs_check' as const,reason:'No extracted text or candidate value',score:null})),tokens:0};
  if(text.length>1600)throw Error('Source is too long for Lev. No call.');
@@ -13,14 +14,20 @@ export async function reviewTextWithLev(result:IntakeLinked,key:string,transport
  const headers={'X-HF-Authorization':`Bearer ${key}`,'Content-Type':'application/json'};
  const host='https://phineas8-tomorrow-lev.hf.space';
  // Separate budgets: queueing the request is quick; ZeroGPU may need longer to return the result. Total stays under 60s.
- const postSignal=AbortSignal.timeout(15000),readSignal=AbortSignal.timeout(40000);
- const r=await transport(host+'/gradio_api/call/score',{method:'POST',headers,body:JSON.stringify({data:[{state:text,questions,model:'english'}]}),signal:postSignal}).catch(e=>{throw Error(timedOut(e)?'Lev request was not accepted within 15s. No automatic retry.':'Lev request could not be sent. No automatic retry.');});
+ const postSignal=AbortSignal.timeout(10000),readSignal=AbortSignal.timeout(50000);
+ let eventId=recoverEventId;
+ if(!eventId){
+ const r=await transport(host+'/gradio_api/call/score',{method:'POST',headers,body:JSON.stringify({data:[{state:text,questions,model:'english'}]}),signal:postSignal}).catch(e=>{throw Error(timedOut(e)?'Lev request was not accepted within 10s. No automatic retry.':'Lev request could not be sent. No automatic retry.');});
  if(!r.ok)throw Error(`Lev unavailable (${r.status}); Space may be asleep. No automatic retry.`);
  const event=z.object({event_id:z.string().regex(/^[a-zA-Z0-9_-]+$/)}).parse(await r.json());
+ eventId=event.event_id;
+ // Saved before the long wait so a finished result can be read later (read-only) if this request is cut off.
+ if(onAccepted)await onAccepted(eventId).catch(()=>undefined);
+ }
  // This GET collects the same queued request. It never submits another score call.
- const collected=await transport(host+'/gradio_api/call/score/'+event.event_id,{headers,signal:readSignal}).catch(e=>{throw Error(timedOut(e)?'Lev accepted the request but returned no result within 40s. No automatic retry.':'Lev result could not be read. No automatic retry.');});
+ const collected=await transport(host+'/gradio_api/call/score/'+eventId,{headers,signal:readSignal}).catch(e=>{throw Error(timedOut(e)?'Lev accepted the request but returned no result within 50s. No automatic retry.':'Lev result could not be read. No automatic retry.');});
  if(!collected.ok)throw Error('Lev result unavailable. No automatic retry.');
- const stream=await collected.text().catch(e=>{throw Error(timedOut(e)?'Lev accepted the request but the result stream timed out at 40s. No automatic retry.':'Lev result stream broke. No automatic retry.');});
+ const stream=await collected.text().catch(e=>{throw Error(timedOut(e)?'Lev accepted the request but the result stream timed out at 50s. No automatic retry.':'Lev result stream broke. No automatic retry.');});
  const complete=stream.split(/\r?\n\r?\n/).find(block=>/^event: complete$/m.test(block));
  const line=complete?.split(/\r?\n/).find(line=>line.startsWith('data: '));
  if(!line){const names=[...new Set([...stream.matchAll(/^event: ([a-z_]{1,20})$/gm)].map(m=>m[1]))].slice(0,5);throw Error(names.includes('error')?'Lev Space returned an error event instead of a result. No retry.':`Lev result stream ended without a result (events: ${names.join(', ')||'none'}). No retry.`);}
