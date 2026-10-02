@@ -1,13 +1,14 @@
 import type {IntakeLinked} from './intake.js';
 
-const fieldPattern=/^(medicine|dose|frequency|duration)_(\d+)$/;
-const labels={medicine:'Medicine name',dose:'Dose',frequency:'How often (written shorthand)',duration:'Duration'};
+const fieldPattern=/^(medicine|dose|quantity|frequency|duration)_(\d+)$/;
+const labels={medicine:'Medicine name',dose:'Dose',quantity:'Amount per dose',frequency:'How often (written shorthand)',duration:'Duration'};
 export function prescriptionLabel(name:string){const match=fieldPattern.exec(name);return match?`${labels[match[1] as keyof typeof labels]} ${match[2]}`:name.replaceAll('_',' ');}
 /** Shape checks are not medical validation. Never repair a guessed letter or unit. */
 export function readingIssue(field:IntakeLinked['fields'][number]):string|null{
  const value=field.value.trim();
  if(!value||/[?\[\]]|illegible|unreadable|uncertain|unclear/i.test(value))return 'Unclear reading. Ask a pharmacist; do not guess.';
  if(/^dose_\d+$/.test(field.name)&&!/^\d+(?:\.\d+)?\s*(?:mg|mcg|g|ml|mL|units?|IU)$/i.test(value))return 'Dose needs a number and a clear unit. Do not infer the unit.';
+ if(/^quantity_\d+$/.test(field.name)&&!/^(?:\d+(?:\.\d+)?|\d+\/\d+|½)\s*(?:tabs?|tablets?|caps?|capsules?|ml|mL|tsp|tbsp|drops?|puffs?)?$/i.test(value))return 'Amount per dose needs a clear written number. Do not infer it from the strength.';
  if(/^duration_\d+$/.test(field.name)&&!/^\d+(?:\.\d+)?\s*(?:d|days?|weeks?|wks?|months?|hours?|hrs?)$/i.test(value))return 'Duration needs a number and a clear time unit. Do not infer the unit.';
  if(/^duration_\d+$/.test(field.name)&&parseFloat(value)<=0)return 'Duration is unclear. Check the original.';
  if(/^medicine_\d+$/.test(field.name)&&field.evidence.some(e=>e.confidence!==null&&e.confidence<.9))return 'Low OCR confidence on this line. Check the medicine letters with a pharmacist.';
@@ -20,7 +21,7 @@ export function reviewPrescription(result:IntakeLinked):IntakeLinked{
  const indices=new Set(fields.map(f=>fieldPattern.exec(f.name)?.[2]).filter((x):x is string=>!!x));
  for(const missing of result.missing){const m=missing.match(/(?:medicine|dose|frequency|duration)_(\d+)/);if(m)indices.add(m[1]);}
  const missing:string[]=[];
- for(const i of indices)for(const type of Object.keys(labels)){
+ for(const i of indices)for(const type of Object.keys(labels).filter(t=>t!=='quantity'||fields.some(f=>f.name===`quantity_${i}`)||result.missing.some(n=>n.includes(`quantity_${i}`)))){
   const name=`${type}_${i}`,matches=fields.filter(f=>f.name===name);
   if(matches.length!==1||!matches[0].verified)missing.push(`${prescriptionLabel(name)}: ${matches.length===1?(readingIssue(matches[0])??'Reading not linked to one OCR line. Check the original.'):'Not read clearly or not present.'}`);
  }
