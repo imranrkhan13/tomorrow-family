@@ -26,3 +26,33 @@ test('literal field mapping rejects matching inside a larger dose or frequency t
 test('numbered rows cannot exchange extracted dose fields',()=>{
  const r=linkIntake(intakeSchema.parse({...answer,fields:[{name:'dose_1',value:'10 mg',quote:'2) Demo 10 mg HS'},{name:'dose_2',value:'10 mg',quote:'2) Demo 10 mg HS'}]}),undefined,'1) Demo 5 mg BD\n2) Demo 10 mg HS');assert.equal(r.fields[0].verified,false);assert.equal(r.fields[1].verified,true);
 });
+import {linkIntake as _link} from '../src/intake.js';
+import _test from 'node:test';import _assert from 'node:assert/strict';
+_test('MOCK: single-word medicine-like reading links as one verified field, nothing invented',()=>{
+ const r=_link({schema_version:'intake.v1',summary:'One word.',category:'support',urgency:'unknown',fields:[{name:'medicine_1',value:'Napa One',quote:'Napa One'}],missing:['dose_1','frequency_1','duration_1']},null,'Napa One');
+ _assert.equal(r.fields.length,1);_assert.equal(r.fields[0].verified,true);_assert.ok(r.reviewReasons.some(x=>/human review/.test(x)));
+});
+import {scheduleReading as _sr} from '../src/prescription.js';
+_test('scheduleReading: 1-0-1 is morning and night, not afternoon; shorthand is not expanded',()=>{
+ _assert.match(_sr('1-0-1')!,/morning and night, not afternoon/);_assert.match(_sr('0-0-1')!,/night, not morning or afternoon/);_assert.equal(_sr('BD'),null);_assert.equal(_sr('TDS'),null);
+});
+import {readingIssue as _ri,prescriptionLabel as _pl} from '../src/prescription.js';
+_test('quantity_N is a separate field and is not inferred',()=>{
+ const f=(value:string)=>({name:'quantity_1',value,quote:value,evidence:[],verified:true});
+ _assert.equal(_pl('quantity_1'),'Amount per dose 1');_assert.equal(_ri(f('1 tab')),null);_assert.equal(_ri(f('200 mg')) !== null,true);
+});
+
+const _q=(value:string,quote:string)=>({name:'quantity_1',value,quote,evidence:[],verified:true});
+_test('quantity_N: explicit per-dose amount passes; absence is never derived from strength, timing, row number or Tab',()=>{
+ _assert.equal(_ri(_q('1 tab','1) Tab Testmed 200mg 1 tab 1-0-1 5 d')),null);
+ for(const [v,q] of [['1','1) Tab Testmed 200mg 1-0-1 5 d'],['1 tab','1) Tab Testmed 200mg 1-0-1 5 d'],['200','1) Tab Testmed 200mg 1-0-1 5 d'],['5','1) Tab Testmed 200mg 1-0-1 5 d'],['2','1) Tab Testmed 200mg 0-1-0 5 d']] as const)_assert.notEqual(_ri(_q(v,q)),null,`${v} in ${q}`);
+});
+import {linkIntake as _lk} from '../src/intake.js';
+_test('MOCK: a row split across consecutive OCR lines links; a loose or ambiguous quote does not',()=>{
+ const mk=(quote:string,value:string)=>({schema_version:'intake.v1' as const,summary:'x',category:'support' as const,urgency:'unknown' as const,fields:[{name:'medicine_1',value,quote}],missing:[]});
+ const text='- T. Opox-CV\n200mg\n1-0-1\nunrelated';
+ _assert.equal(_lk(mk('- T. Opox-CV 200mg 1-0-1','T. Opox-CV'),null,text).fields[0].verified,true);
+ _assert.equal(_lk(mk('- T. Opox-CV 400mg 1-0-1','T. Opox-CV'),null,text).fields[0].verified,false);
+ _assert.equal(_lk(mk('Opox-CV 200mg','Opox-CV'),null,text).fields[0].verified,false);
+ _assert.equal(_lk(mk('- T. Opox-CV 200mg 1-0-1','Opox-CX'),null,text).fields[0].verified,false);
+});
