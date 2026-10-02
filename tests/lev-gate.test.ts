@@ -12,6 +12,16 @@ test('Lev diagnostics name the failing stage without leaking text or keys',async
  await assert.rejects(reviewTextWithLev(result,'SECRETKEY',mk('event: error\ndata: "private prompt text"\n\n')),(e:any)=>/error event/.test(e.message)&&!/private|SECRETKEY/.test(e.message));
  await assert.rejects(reviewTextWithLev(result,'SECRETKEY',mk('event: heartbeat\ndata: null\n\n')),(e:any)=>/ended without a result \(events: heartbeat\)/.test(e.message));
  const timeout=Object.assign(new Error('x'),{name:'TimeoutError'});
- await assert.rejects(reviewTextWithLev(result,'SECRETKEY',(async(_u:any,opts:any)=>{if(opts?.body)return new Response(JSON.stringify({event_id:'test-event'}));throw timeout;}) as typeof fetch),(e:any)=>/no result within 40s/.test(e.message));
- await assert.rejects(reviewTextWithLev(result,'SECRETKEY',(async()=>{throw timeout;}) as typeof fetch),(e:any)=>/not accepted within 15s/.test(e.message));
+ await assert.rejects(reviewTextWithLev(result,'SECRETKEY',(async(_u:any,opts:any)=>{if(opts?.body)return new Response(JSON.stringify({event_id:'test-event'}));throw timeout;}) as typeof fetch),(e:any)=>/no result within 50s/.test(e.message));
+ await assert.rejects(reviewTextWithLev(result,'SECRETKEY',(async()=>{throw timeout;}) as typeof fetch),(e:any)=>/not accepted within 10s/.test(e.message));
+});
+
+test('event id is saved before the wait and recovery only reads, never submits',async()=>{
+ let saved='';const stream='event: complete\ndata: '+JSON.stringify([{answers:{f0:{type:'noul',noul:.9},f1:{type:'noul',noul:.9}},usage:{input_tokens:10,output_tokens:2}}])+'\n\n';
+ const timeout=Object.assign(new Error('x'),{name:'TimeoutError'});
+ await assert.rejects(reviewTextWithLev(result,'SECRETKEY',(async(_u:any,opts:any)=>{if(opts?.body)return new Response(JSON.stringify({event_id:'ev-1'}));throw timeout;}) as typeof fetch,true,async id=>{saved=id;}),/no result within 50s/);
+ assert.equal(saved,'ev-1');
+ const methods:string[]=[];
+ const out=await reviewTextWithLev(result,'SECRETKEY',(async(u:any,opts:any)=>{methods.push(opts?.method??'GET');assert.match(String(u),/call\/score\/ev-1$/);return new Response(stream);}) as typeof fetch,true,undefined,'ev-1');
+ assert.deepEqual(methods,['GET']);assert.ok(out.tokens===12);
 });
