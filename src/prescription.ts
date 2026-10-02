@@ -49,4 +49,13 @@ export function sourceStatesValue(text:string,value:string){
  const clean=(s:string)=>s.trim().replace(/\s+/g,' ');
  const source=clean(text),candidate=clean(value);if(!candidate)return false;
  let at=source.indexOf(candidate);while(at>=0){const before=at?source[at-1]:'',after=source[at+candidate.length]??'';if(!/[a-z0-9]/i.test(before)&&!/[a-z0-9]/i.test(after))return true;at=source.indexOf(candidate,at+1);}return false;
-   }
+}
+
+/** Plain-words view of a written N-N-N notation. Display only: never a dose, treatment or reminder. */
+export function scheduleReading(value:string):string|null{
+ const m=/^\s*(\d{1,2})\s*[-–]\s*(\d{1,2})\s*[-–]\s*(\d{1,2})\s*$/.exec(value);if(!m)return null;
+ const parts=[['morning',+m[1]],['afternoon',+m[2]],['night',+m[3]]] as const;
+ const on=parts.filter(([,n])=>n>0).map(([t,n])=>n===1?t:`${t} (${n})`),off=parts.filter(([,n])=>n===0).map(([t])=>t);
+ if(!on.length)return `Written as ${value.trim()}: no time marked. Check the original.`;
+ return `Written as ${value.trim()}: ${on.join(' and ')}${off.length?`, not ${off.join(' or ')}`:''}. Confirm against the original.`;
+}
