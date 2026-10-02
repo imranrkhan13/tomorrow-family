@@ -14,3 +14,16 @@ test('lev one-shot record: runs only for the named hash, once, while the global 
  assert.equal((await call({},transport,{record:hash})).body.cacheHit,true);assert.equal(calls,2);
  assert.equal((await call({},transport)).body.cacheHit,true);
  }finally{delete process.env.TOMORROW_ONESHOT_RECORD;restore();}});
+
+test('lev retry-once clears one failed entry for the one-shot record, never twice',async()=>{const restore=await setup();let calls=0;try{textCheckHold.held=true;const hash=intakeKey(input).replace(':intake.v1','');const bad=(async(_u:any,opts:any)=>{calls++;if(opts?.body)return new Response(JSON.stringify({event_id:'e'}));return new Response('event: error\ndata: x\n\n');}) as typeof fetch;
+ const good=(async(_u:any,opts:any)=>{calls++;return opts?.body?new Response(JSON.stringify({event_id:'e'})):new Response('event: complete\ndata: '+JSON.stringify([{answers:{f0:{type:'noul',noul:.1}},usage:{input_tokens:40,output_tokens:0}}])+'\n\n');}) as typeof fetch;
+ process.env.TOMORROW_ONESHOT_RECORD=hash;assert.equal((await call({},bad,{record:hash})).status,502);assert.equal(calls,2);
+ assert.equal((await call({},good,{record:hash})).body.status,'failed');assert.equal(calls,2);// still blocked: no retry env
+ process.env.TOMORROW_LEV_RETRY_ONCE=hash;const r=await call({},good,{record:hash});assert.equal(r.body.status,'ok');assert.equal(calls,4);
+ const again=await call({},good,{record:hash});assert.equal(again.body.cacheHit,true);assert.equal(calls,4);
+ }finally{delete process.env.TOMORROW_ONESHOT_RECORD;delete process.env.TOMORROW_LEV_RETRY_ONCE;restore();}});
+test('lev retry-once cannot reopen a second failure',async()=>{const restore=await setup();let calls=0;try{textCheckHold.held=true;const hash=intakeKey(input).replace(':intake.v1','');const bad=(async(_u:any,opts:any)=>{calls++;if(opts?.body)return new Response(JSON.stringify({event_id:'e'}));return new Response('event: error\ndata: x\n\n');}) as typeof fetch;
+ process.env.TOMORROW_ONESHOT_RECORD=hash;process.env.TOMORROW_LEV_RETRY_ONCE=hash;assert.equal((await call({},bad,{record:hash})).status,502);assert.equal(calls,2);
+ assert.equal((await call({},bad,{record:hash})).status,502);assert.equal(calls,4);// the one allowed retry
+ assert.equal((await call({},bad,{record:hash})).body.status,'failed');assert.equal(calls,4);
+ }finally{delete process.env.TOMORROW_ONESHOT_RECORD;delete process.env.TOMORROW_LEV_RETRY_ONCE;restore();}});
