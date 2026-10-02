@@ -31,3 +31,6 @@ export async function extract(input:Input,store:Store,config:Config,transport:ty
  const response=await call('extract',{model:'interfaze',messages:[{role:'system',content:prompt},{role:'user',content:isAudio?`${input.text}\n${transcript}`:base}],response_format:{type:'json_schema',json_schema:{name:'tomorrow_v1',strict:true,schema:z.toJSONSchema(outputSchema)}},max_tokens:6000});
  try{const parsed=outputSchema.parse(JSON.parse(response.content));precontext=response.precontext;const evidence=evidenceFrom(precontext,isAudio?`${input.text}${input.text?'\n':''}${transcript}`:input.text);const result:Result={summary:parsed.summary,tasks:link(parsed,evidence),transcript,tokens:totalTokens+response.tokens,usd:totalUsd+response.usd,latencyMs:totalMs+response.latencyMs,cacheHit:false,inputHash:id};await store.finish(id,{status:'ok',result,raw:'raw' in response?response.raw:undefined},response.tokens,response.usd);return result;}catch(e){await store.fail(id,'INTERFAZE_INVALID_OUTPUT: response did not match the schema. No retry.','raw' in response?response.raw:undefined);throw e;}
 }
+/** Unconditional spend hold for Jev and Lev provider calls. Only a reviewed code change may turn it off.
+ * Tests flip it in-process to exercise the provider path with mocked transports. */
+export const textCheckHold={held:true};
