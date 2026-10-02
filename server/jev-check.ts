@@ -7,6 +7,7 @@ import {storeFor} from './http.js';
 import {reviewTextWithJev} from './jev-gate.js';
 import {FileJevBudget,RedisJevBudget,type JevBudget} from './jev-budget.js';
 import type {IntakeLinked} from '../src/intake.js';
+import {textCheckHold} from './extraction.js';
 export function budgetFor(local=false):JevBudget|null{if(local)return new FileJevBudget();const url=process.env.UPSTASH_REDIS_REST_URL??process.env.KV_REST_API_URL,token=process.env.UPSTASH_REDIS_REST_TOKEN??process.env.KV_REST_API_TOKEN;return url&&token?new RedisJevBudget(url,token):null;}
 export async function checkJev(req:IncomingMessage,res:ServerResponse,local=false,transport:typeof fetch=fetch){const reply=(status:number,body:unknown)=>{res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(body));};
  if(req.method!=='POST'){reply(405,{error:'Method not allowed'});return;}
@@ -17,7 +18,7 @@ export async function checkJev(req:IncomingMessage,res:ServerResponse,local=fals
  try{const source=await store.lookup(intakeKey(input));if(source?.status!=='ok'){reply(409,{error:'No completed prescription reading; no Jev call.'});return;}
  const result=savedIntake(source,input);if(result.useCase!=='prescription'){reply(409,{error:'Older reading is not eligible for Jev.'});return;}
  const id=createHash('sha256').update('jev.v1:'+intakeKey(input)).digest('hex');const existing=await budget.lookup(id);if(existing){reply(200,existing.status==='ok'?{status:'ok',findings:existing.findings,cacheHit:true}:{status:existing.status,error:existing.error??'Check pending; no repeat.'});return;}if(req.headers['x-tomorrow-jev-readonly']==='true'){reply(200,{status:'missing',error:'No saved Jev result. No provider call.'});return;}
- if(process.env.TEXT_CHECKS_ENABLED!=='true'){reply(200,{status:'held',error:'Checks are held until provider billing is confirmed. Not run, no score.'});return;}
+ if(textCheckHold.held){reply(200,{status:'held',error:'Checks are held until provider billing is confirmed. Not run, no score.'});return;}
  // Every extraction is checked, including readings the app could not match to one OCR line. Source support stays visible per field.
  const context=textCheckInput(result,true);if(!context.text.trim()||!context.fields.length){reply(200,{status:'skipped',error:'No extracted text or candidate values to check.'});return;}if(context.text.length>8000){reply(409,{error:'Source is too long for Jev. No call.'});return;}
  await budget.reserve(id);try{const output=await reviewTextWithJev(result,key,transport,true);if(output.tokens>100_000||output.tokens<0||!Number.isSafeInteger(output.tokens))throw Error('Jev usage exceeded reservation; halted.');await budget.finish(id,output.findings,output.tokens);reply(200,{status:'ok',findings:output.findings,cacheHit:false});}catch(e){const message=e instanceof Error?e.message:'Jev result uncertain';await budget.fail(id,message);reply(502,{status:'failed',error:'Jev check unavailable; no retry. Check every field yourself.'});}
