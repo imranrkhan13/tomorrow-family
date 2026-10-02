@@ -5,7 +5,7 @@ import {mkdir,open,readFile,rename,unlink,writeFile} from 'node:fs/promises';
 import type {GateFinding} from './jev-gate.js';
 export type LevEntry={status:'pending'|'ok'|'failed';findings?:GateFinding[];error?:string};
 export type LevLedger={tokens:number;halted:boolean;reason?:string};
-export interface LevBudget{lookup(id:string):Promise<LevEntry|null>;reserve(id:string):Promise<void>;finish(id:string,findings:GateFinding[],tokens:number):Promise<void>;fail(id:string,error:string):Promise<void>;ledger():Promise<LevLedger>}
+export interface LevBudget{lookup(id:string):Promise<LevEntry|null>;reserve(id:string):Promise<void>;finish(id:string,findings:GateFinding[],tokens:number):Promise<void>;retryOnce(id:string):Promise<boolean>;fail(id:string,error:string):Promise<void>;ledger():Promise<LevLedger>}
 export const CAP=200_000, RESERVE=100_000;
 const blank=():LevLedger=>({tokens:0,halted:false});
 export class FileLevBudget implements LevBudget{
@@ -16,6 +16,7 @@ export class FileLevBudget implements LevBudget{
  async ledger(){return(await this.read()).ledger;}
  async reserve(id:string){await this.change(s=>{if(s.entries[id])throw Error('LEV_ALREADY_RESERVED: no repeat.');if(s.ledger.halted)throw Error('LEV_HALTED: usage uncertain.');if(s.ledger.tokens+RESERVE>CAP)throw Error('LEV_CAP_REACHED: no provider call.');s.entries[id]={status:'pending'};s.ledger.halted=true;s.ledger.reason='Call pending';});}
  async finish(id:string,findings:GateFinding[],tokens:number){await this.change(s=>{if(s.entries[id]?.status!=='pending')throw Error('LEV_ENTRY_NOT_PENDING');s.entries[id]={status:'ok',findings};s.ledger={tokens:s.ledger.tokens+tokens,halted:!Number.isSafeInteger(tokens)||tokens<0||tokens>RESERVE||s.ledger.tokens+tokens>CAP};if(s.ledger.halted)s.ledger.reason='Usage exceeded reservation; no further calls';});}
+ async retryOnce(id:string){let done=false;await this.change(s=>{const m=s as unknown as {retried?:Record<string,boolean>};m.retried??={};if(s.entries[id]?.status==='failed'&&!m.retried[id]){m.retried[id]=true;delete s.entries[id];s.ledger.halted=false;delete s.ledger.reason;done=true;}});return done;}
  async fail(id:string,error:string){await this.change(s=>{s.entries[id]={status:'failed',error};s.ledger.halted=true;s.ledger.reason=error;});}
 }
 export class RedisLevBudget implements LevBudget{
@@ -26,5 +27,7 @@ export class RedisLevBudget implements LevBudget{
  async reserve(id:string){const script=`if redis.call('EXISTS',KEYS[1])==1 then return 'ALREADY_RESERVED' end;local v=redis.call('GET',KEYS[2]);local s=v and cjson.decode(v) or {tokens=0,halted=false};if s.halted then return 'HALTED' end;if tonumber(s.tokens)+100000>200000 then return 'CAP_REACHED' end;redis.call('SET',KEYS[1],'{"status":"pending"}');s.halted=true;s.reason='Call pending';redis.call('SET',KEYS[2],cjson.encode(s));return 'OK'`;
  const r=await this.command('EVAL',script,2,'tomorrow:lev:entry:'+id,'tomorrow:lev:ledger');if(r!=='OK')throw Error('LEV_'+r+': no provider call.');}
  async finish(id:string,findings:GateFinding[],tokens:number){if(!Number.isSafeInteger(tokens)||tokens<0)throw Error('LEV_INVALID_USAGE');const script=`local s=cjson.decode(redis.call('GET',KEYS[2]));if redis.call('GET',KEYS[1])~='{"status":"pending"}' then return 'NOT_PENDING' end;s.tokens=s.tokens+tonumber(ARGV[2]);s.halted=tonumber(ARGV[2])>100000 or s.tokens>200000;if s.halted then s.reason='Usage exceeded reservation; no further calls' else s.reason=nil end;redis.call('SET',KEYS[1],ARGV[1]);redis.call('SET',KEYS[2],cjson.encode(s));return 'OK'`;const r=await this.command('EVAL',script,2,'tomorrow:lev:entry:'+id,'tomorrow:lev:ledger',JSON.stringify({status:'ok',findings}),tokens);if(r!=='OK')throw Error('LEV_'+r);}
+ /** One-time recovery of a failed entry: needs a never-used marker, so a second failure cannot reopen it. */
+ async retryOnce(id:string){const script=`local e=redis.call('GET',KEYS[1]);if not e or cjson.decode(e).status~='failed' then return 'NOT_FAILED' end;if redis.call('EXISTS',KEYS[3])==1 then return 'ALREADY_RETRIED' end;redis.call('SET',KEYS[3],'1');redis.call('DEL',KEYS[1]);local l=cjson.decode(redis.call('GET',KEYS[2]));l.halted=false;l.reason=nil;redis.call('SET',KEYS[2],cjson.encode(l));return 'OK'`;return await this.command('EVAL',script,3,'tomorrow:lev:entry:'+id,'tomorrow:lev:ledger','tomorrow:lev:retried:'+id)==='OK';}
  async fail(id:string,error:string){await this.command('EVAL',`local s=cjson.decode(redis.call('GET',KEYS[2]));s.halted=true;s.reason=ARGV[2];redis.call('SET',KEYS[1],ARGV[1]);redis.call('SET',KEYS[2],cjson.encode(s));return 'OK'`,2,'tomorrow:lev:entry:'+id,'tomorrow:lev:ledger',JSON.stringify({status:'failed',error}),error);}
 }
