@@ -9,6 +9,11 @@ export function readingIssue(field:IntakeLinked['fields'][number]):string|null{
  if(!value||/[?\[\]]|illegible|unreadable|uncertain|unclear/i.test(value))return 'Unclear reading. Ask a pharmacist; do not guess.';
  if(/^dose_\d+$/.test(field.name)&&!/^\d+(?:\.\d+)?\s*(?:mg|mcg|g|ml|mL|units?|IU)$/i.test(value))return 'Dose needs a number and a clear unit. Do not infer the unit.';
  if(/^quantity_\d+$/.test(field.name)&&!/^(?:\d+(?:\.\d+)?|\d+\/\d+|½)\s*(?:tabs?|tablets?|caps?|capsules?|ml|mL|tsp|tbsp|drops?|puffs?)?$/i.test(value))return 'Amount per dose needs a clear written number. Do not infer it from the strength.';
+ if(/^quantity_\d+$/.test(field.name)){
+  // A number that is only a row marker, part of a timing pattern, a strength or a duration is not an amount per dose.
+  const rest=field.quote.replace(/^\s*\d+\s*[).:-]\s*/,' ').replace(/\b\d+\s*[-–]\s*\d+\s*[-–]\s*\d+\b/g,' ').replace(/\b\d+(?:\.\d+)?\s*(?:mg|mcg|g|units?|IU)\b/gi,' ').replace(/\b\d+(?:\.\d+)?\s*(?:d|days?|weeks?|wks?|months?|hours?|hrs?)\b/gi,' ');
+  if(!sourceStatesValue(rest,value))return 'Amount per dose is not written separately in this line. Do not infer it from the strength, timing or a form word.';
+ }
  if(/^duration_\d+$/.test(field.name)&&!/^\d+(?:\.\d+)?\s*(?:d|days?|weeks?|wks?|months?|hours?|hrs?)$/i.test(value))return 'Duration needs a number and a clear time unit. Do not infer the unit.';
  if(/^duration_\d+$/.test(field.name)&&parseFloat(value)<=0)return 'Duration is unclear. Check the original.';
  if(/^medicine_\d+$/.test(field.name)&&field.evidence.some(e=>e.confidence!==null&&e.confidence<.9))return 'Low OCR confidence on this line. Check the medicine letters with a pharmacist.';
