@@ -19,8 +19,8 @@ function status(message:string){message=message.replace(/Interfaze/g,'The reader
 function fieldKey(f:IntakeLinked['fields'][number],index:number){return `${index}:${f.name}`;}
 function providerCheckMarkup(name:string,state:Item['jevStatus'],findings:Item['jev'],result?:Item['result']){
  const checked=(findings??[]).filter(f=>f.score!==null&&Number.isFinite(f.score)&&f.score>=0&&f.score<=1);
- const message=state==='ok'?(checked.length?'Text check complete':'Complete · no score returned'):state==='skipped'?(result&&result.fields.length&&!result.fields.some(f=>f.verified&&f.value.trim()&&f.quote.includes(f.value))?'Not run · no reading matched the source text exactly. Nothing was sent. Compare each field with the original.':'Skipped · no text or values'):state==='held'?'Held · not run. Checks are paused until provider billing is confirmed. No score.':state==='pending'?'Checking text…':state==='failed'?'Failed · no retry':state==='unknown'?'No confirmed result':state==='missing'?'No saved result':'Not checked yet';
- return `<div class="provider-check" data-provider="${esc(name)}"><h4>${esc(name)}</h4><p>${esc(message)}</p>${state==='ok'&&checked.length?`<ul>${checked.map(f=>`<li><span>${esc(prescriptionLabel(f.field).replace(/ \d+$/,'').replace(' (written shorthand)',''))}<br>${esc(f.reading)}</span><b>${(f.score!*100).toFixed(1)}%<small>${f.status==='text_agrees'?'Text agrees':'Needs check'}</small></b></li>`).join('')}</ul>`:'<span class="no-score">No confidence score</span>'}</div>`;
+ const message=state==='ok'?(checked.length?'Text check complete · scores show how well the OCR text agrees with each value. They are not medicine-name accuracy or photo confidence.':'Complete · no score returned'):state==='skipped'?(result&&result.fields.length&&!result.fields.some(f=>f.verified&&f.value.trim()&&f.quote.includes(f.value))?'Not run · no reading matched the source text exactly. Nothing was sent. Compare each field with the original.':'Skipped · no text or values'):state==='held'?'Held · not run. Checks are paused until provider billing is confirmed. No score.':state==='pending'?'Checking text…':state==='failed'?'Failed · no retry':state==='unknown'?'No confirmed result':state==='missing'?'No saved result':'Not checked yet';
+ return `<div class="provider-check" data-provider="${esc(name)}"><h4>${esc(name)}</h4><p>${esc(message)}</p>${state==='ok'&&checked.length?`<ul>${checked.map(f=>`<li><span>${esc(prescriptionLabel(f.field).replace(/ \d+$/,'').replace(' (written shorthand)',''))}<br>${esc(f.reading)}</span><b>${(f.score!*100).toFixed(1)}%<small>${f.status==='text_agrees'?'OCR text agrees':'OCR text unclear or absent'}</small></b></li>`).join('')}</ul>`:'<span class="no-score">No confidence score</span>'}</div>`;
 }
 function resultMarkup(item:Item){
  const result=reviewPrescription(item.result!),legacy=result.useCase!=='prescription';
@@ -92,7 +92,7 @@ async function checkLevAfterIntake(item:Item,readonly=false){
   readonly=readonly||(!!saved.levStatus&&saved.levStatus!=='held');
   if(saved.result?.useCase!=='prescription'||!textCheckInput(saved.result).text.trim()||!textCheckInput(saved.result).fields.length){await db.put({...saved,levStatus:'skipped'});return;}
   if(!readonly){await db.put({...saved,levStatus:'pending'});await refresh();}
-  const r=await fetch('/api/lev-check',{method:'POST',headers:{'Content-Type':'application/json',...(readonly?{'X-Tomorrow-Lev-Readonly':'true'}:{})},body:JSON.stringify(await payload(saved)),signal:AbortSignal.timeout(40000)});
+  const r=await fetch('/api/lev-check',{method:'POST',headers:{'Content-Type':'application/json',...(readonly?{'X-Tomorrow-Lev-Readonly':'true'}:{})},body:JSON.stringify(await payload(saved)),signal:AbortSignal.timeout(58000)});
   const data=await r.json() as {status:string;findings?:Item['lev'];error?:string};
   const current=(await db.all()).find(x=>x.id===item.id)??saved;
   const state=jevState(data);
