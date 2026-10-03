@@ -18,3 +18,10 @@ export function linkIntake(result:IntakeResult,raw:unknown,text:string):Pick<Int
  reasons.push('Confirm the proposed category and urgency before any downstream action.');
  return{fields,reviewReasons:reasons,sourceLines:sources};
 }
+
+/** A value elsewhere on the page is not support for this field's own quote/row. */
+export function fieldHasSourceSupport(result:IntakeLinked,field:IntakeLinked['fields'][number]){
+ const text=textForSupport(result);
+ return !!linkIntake({...result,fields:[field]},null,text).fields[0]?.verified;
+}
+function textForSupport(result:IntakeLinked){return [...new Set((result.sourceLines?.length?result.sourceLines.map(e=>e.quote):result.fields.map(f=>f.quote)).filter(s=>s.trim()))].join('\n');}
