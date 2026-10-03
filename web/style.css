@@ -181,3 +181,25 @@ body:has(.review-screen){height:100dvh;overflow:hidden}
 .ra-note{flex:1 1 100%;margin:0;font-size:11px;color:#777;line-height:1.35}
 .ra-v strong{overflow-wrap:normal;word-break:normal}
 @media(min-width:700px){.ra-row,.ra-head{grid-template-columns:1.8fr 1fr 1fr 1fr}.ra-note{grid-column:1/-1;font-size:12px}.ra-v.k-medicine strong{font-size:20px}}
+
+/* Preserve field meaning when a row has a missing value or an amount per dose. */
+.ra-missing{cursor:default;color:#999}.ra-missing strong{font-weight:400;font-size:14px!important}
+.ra-label{color:#777;font-size:11px;margin-top:1px}
+.checks-title{font-size:14px;margin:0 0 5px;font-weight:600}
+.checks-note{font-size:12px;line-height:1.45;color:#777;margin:0 0 14px;max-width:38ch}
+.rs .provider-check p{margin:0 0 5px;font-size:11px;color:#777}
+.rs .provider-check li b{font-size:12px;font-weight:500;white-space:nowrap}
+.rs .provider-check li b small{display:none}
+.rs .provider-check li span{font-size:12px;color:#555}
+.rs .provider-check h4{font-size:12px;font-weight:600}
+@media(min-width:700px){
+ .ra-v .ra-label{display:none}
+ .ra:has(.k-quantity) .ra-row,.ra-head:has(span:nth-child(5)){grid-template-columns:1.6fr .9fr 1fr 1fr .9fr}
+}
+@media(min-width:900px){
+ .rs-body{grid-template-columns:minmax(0,2.3fr) minmax(0,1fr);gap:32px}
+ .rs .p-checks{padding-left:24px}
+}
+.rs .provider-check li b>small{display:none!important}
+.rs-pager{flex-wrap:nowrap;min-height:44px}.rs-pager span{text-align:center;font-size:11px}
+@media(min-width:900px){.rs-pager button{padding:6px 8px}}
