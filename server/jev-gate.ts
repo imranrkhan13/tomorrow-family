@@ -1,3 +1,4 @@
+import {fieldHasSourceSupport} from '../src/intake.js';
 import {textCheckInput,sourceStatesValue} from '../src/prescription.js';
 /** Jev checks Interfaze-linked text, not image pixels or medicine safety. */
 import {z} from 'zod';
@@ -18,5 +19,5 @@ export async function reviewTextWithJev(result:IntakeLinked,key:string,transport
  const parsed=response.parse(await r.json());
  const byName=new Map(parsed.decisions.map(d=>[d.field,d]));
  if(!parsed.usage)throw Error('Jev usage not reported; budget halted.');
- return {tokens:parsed.usage.input_tokens+parsed.usage.output_tokens,findings:result.fields.map(f=>{const index=fields.indexOf(f);if(index<0)return{field:f.name,reading:f.value,status:'needs_check' as const,reason:'No candidate value to check',score:null};const d=byName.get(`candidate_${index}`);if(!d)return{field:f.name,reading:f.value,status:'needs_check' as const,reason:'No Jev answer for this text candidate',score:null};return{field:f.name,reading:f.value,status:d.action==='fill'&&sourceStatesValue(text,f.value)?'text_agrees' as const:'needs_check' as const,reason:!sourceStatesValue(text,f.value)?'Value absent from extracted source text; provider score cannot verify it':d.action==='fill'?'Jev agreed with extracted text; handwriting and medicine remain unchecked':d.reason??'Jev did not agree with the text candidate',score:d.confidence??null};})};
+ return {tokens:parsed.usage.input_tokens+parsed.usage.output_tokens,findings:result.fields.map(f=>{const index=fields.indexOf(f);if(index<0)return{field:f.name,reading:f.value,status:'needs_check' as const,reason:'No candidate value to check',score:null};const d=byName.get(`candidate_${index}`);if(!d)return{field:f.name,reading:f.value,status:'needs_check' as const,reason:'No Jev answer for this text candidate',score:null};return{field:f.name,reading:f.value,status:d.action==='fill'&&fieldHasSourceSupport(result,f)?'text_agrees' as const:'needs_check' as const,reason:!fieldHasSourceSupport(result,f)?'Value absent from its exact source row or quote; provider score cannot verify it':d.action==='fill'?'Jev agreed with extracted text; handwriting and medicine remain unchecked':d.reason??'Jev did not agree with the text candidate',score:d.confidence??null};})};
 }
