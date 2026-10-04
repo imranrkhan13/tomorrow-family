@@ -1,0 +1,193 @@
+{
+  "status": "UNRUN: no reader/model calls",
+  "limits": "Font-rendered structural fixtures, not genuine messy handwriting or clinical validation. Expected fields fixed before rendering, not produced by a model. All medicines and pages fictional.",
+  "font": "DejaVu Sans Oblique, local font licence copied alongside files",
+  "cases": [
+    {
+      "id": "clear",
+      "image": "clear.png",
+      "sha256": "18afa7904c8cc2916379f3e5b85494beb14ff5f805c3955b027226147ee171e9",
+      "source_lines": [
+        "1) SYN-A 15 mg 1 tablet 1-0-1 5 d",
+        "2) SYN-B 10 mg 2 tablets 0-0-1 3 d"
+      ],
+      "expected": [
+        {
+          "name": "medicine_1",
+          "value": "SYN-A"
+        },
+        {
+          "name": "dose_1",
+          "value": "15 mg"
+        },
+        {
+          "name": "quantity_1",
+          "value": "1 tablet"
+        },
+        {
+          "name": "frequency_1",
+          "value": "1-0-1"
+        },
+        {
+          "name": "duration_1",
+          "value": "5 d"
+        },
+        {
+          "name": "medicine_2",
+          "value": "SYN-B"
+        },
+        {
+          "name": "dose_2",
+          "value": "10 mg"
+        },
+        {
+          "name": "quantity_2",
+          "value": "2 tablets"
+        },
+        {
+          "name": "frequency_2",
+          "value": "0-0-1"
+        },
+        {
+          "name": "duration_2",
+          "value": "3 d"
+        }
+      ]
+    },
+    {
+      "id": "missing-units",
+      "image": "missing-units.png",
+      "sha256": "d4eee674dff6fed7a2a4f81c53e3e1335f86104093c2a0f722f445162acbe58d",
+      "source_lines": [
+        "1) SYN-A 15 1-0-1",
+        "2) SYN-B 10 mg HS 3 X"
+      ],
+      "expected": [
+        {
+          "name": "medicine_1",
+          "value": "SYN-A"
+        },
+        {
+          "name": "frequency_1",
+          "value": "1-0-1"
+        },
+        {
+          "name": "medicine_2",
+          "value": "SYN-B"
+        },
+        {
+          "name": "dose_2",
+          "value": "10 mg"
+        },
+        {
+          "name": "frequency_2",
+          "value": "HS"
+        }
+      ]
+    },
+    {
+      "id": "procedure-only",
+      "image": "procedure-only.png",
+      "sha256": "8bfb2621c3909e72e079e8f43630312c32341bcc834c6f1d7fe9ce0499667b56",
+      "source_lines": [
+        "1) Foley monitor THS",
+        "2) Blood pressure check"
+      ],
+      "expected": []
+    },
+    {
+      "id": "near-names",
+      "image": "near-names.png",
+      "sha256": "eb12727dcdb1b41e3dae51c59a88e187a97392fcb38c039678ee9b09e24b4dbf",
+      "source_lines": [
+        "1) SYN-IIO 5 mg BD 4 d",
+        "2) SYN-110 15 mg HS 3 d"
+      ],
+      "expected": [
+        {
+          "name": "medicine_1",
+          "value": "SYN-IIO"
+        },
+        {
+          "name": "dose_1",
+          "value": "5 mg"
+        },
+        {
+          "name": "frequency_1",
+          "value": "BD"
+        },
+        {
+          "name": "duration_1",
+          "value": "4 d"
+        },
+        {
+          "name": "medicine_2",
+          "value": "SYN-110"
+        },
+        {
+          "name": "dose_2",
+          "value": "15 mg"
+        },
+        {
+          "name": "frequency_2",
+          "value": "HS"
+        },
+        {
+          "name": "duration_2",
+          "value": "3 d"
+        }
+      ]
+    },
+    {
+      "id": "split-lines",
+      "image": "split-lines.png",
+      "sha256": "d91233d941f0d9baf3a5bed4fa22f3ff088dcbbe33e5dfd924218658fc2203ec",
+      "source_lines": [
+        "1) SYN-A",
+        "200 mg",
+        "1-0-1",
+        "5 d"
+      ],
+      "expected": [
+        {
+          "name": "medicine_1",
+          "value": "SYN-A"
+        },
+        {
+          "name": "dose_1",
+          "value": "200 mg"
+        },
+        {
+          "name": "frequency_1",
+          "value": "1-0-1"
+        },
+        {
+          "name": "duration_1",
+          "value": "5 d"
+        }
+      ]
+    },
+    {
+      "id": "unreadable-name",
+      "image": "unreadable-name.png",
+      "sha256": "f986201e63a82595f563a91fb94e86b3f8354dbd3d11cfc8d0f44ce5f0171019",
+      "source_lines": [
+        "1) ?????? 200 mg 1-0-1 5 d"
+      ],
+      "expected": [
+        {
+          "name": "dose_1",
+          "value": "200 mg"
+        },
+        {
+          "name": "frequency_1",
+          "value": "1-0-1"
+        },
+        {
+          "name": "duration_1",
+          "value": "5 d"
+        }
+      ]
+    }
+  ]
+}
