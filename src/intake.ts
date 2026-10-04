@@ -21,7 +21,8 @@ export function linkIntake(result:IntakeResult,raw:unknown,text:string):Pick<Int
 
 /** A value elsewhere on the page is not support for this field's own quote/row. */
 export function fieldHasSourceSupport(result:IntakeLinked,field:IntakeLinked['fields'][number]){
+ if(!result.sourceLines?.some(line=>line.quote.trim()))return false;
  const text=textForSupport(result);
  return !!linkIntake({...result,fields:[field]},null,text).fields[0]?.verified;
 }
-function textForSupport(result:IntakeLinked){return [...new Set((result.sourceLines?.length?result.sourceLines.map(e=>e.quote):result.fields.map(f=>f.quote)).filter(s=>s.trim()))].join('\n');}
+function textForSupport(result:IntakeLinked){return (result.sourceLines??[]).map(e=>e.quote).filter(s=>s.trim()).join('\n');}
