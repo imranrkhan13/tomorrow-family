@@ -203,3 +203,5 @@ body:has(.review-screen){height:100dvh;overflow:hidden}
 .rs .provider-check li b>small{display:none!important}
 .rs-pager{flex-wrap:nowrap;min-height:44px}.rs-pager span{text-align:center;font-size:11px}
 @media(min-width:900px){.rs-pager button{padding:6px 8px}}
+/* A high raw score is not an accepted check when its source row does not match. */
+.rs .provider-check li b>small.needs-check{display:block!important;color:#a3403b;font-size:10px;font-weight:400}
