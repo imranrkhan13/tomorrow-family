@@ -1,0 +1,10 @@
+{
+  "status": "UNRUN - no provider requests",
+  "scope": "Fictional text support only, not image recognition or medical safety",
+  "cases": [
+    {"id":"wrong-row","field":"dose_1","source":"1) SYN-A 5 mg BD\n2) SYN-B 10 mg HS","candidates":[{"id":"right","value":"5 mg","correct":true},{"id":"borrowed","value":"10 mg","correct":false},{"id":"invented","value":"15 mg","correct":false}]},
+    {"id":"lookalike","field":"medicine_1","source":"1) SYN-IIO 5 mg BD","candidates":[{"id":"right","value":"SYN-IIO","correct":true},{"id":"wrong-digits","value":"SYN-110","correct":false}]},
+    {"id":"abstain","field":"medicine_1","source":"1) ?????? 200 mg 1-0-1 5 d","candidates":[{"id":"none-supported","value":"NONE_SUPPORTED","correct":true},{"id":"guessed","value":"SYN-A","correct":false}]},
+    {"id":"missing-unit","field":"dose_1","source":"1) SYN-A 15 BD","candidates":[{"id":"none-supported","value":"NONE_SUPPORTED","correct":true},{"id":"invented-unit","value":"15 mg","correct":false}]}
+  ]
+}
